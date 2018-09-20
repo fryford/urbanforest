@@ -1,0 +1,12 @@
+{"ons":{
+"maptitle": "map about life expectancy",
+"varcolour": "PuBu",
+"varunit": "change in months",
+"groups":["buildings","cars","vegetation"],
+"colours":["#377eb8","#ff7f00","#4daf4a","#984ea3","#e41a1c"],
+"displaydecimals": 1,
+"legenddecimals": 0,
+"breaks": "equal",
+"dropticks": false,
+"numberBreaks": 5
+}}

@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <title>Map title here</title>
+  <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+
+  <link href='css/mapbox-gl.css' rel='stylesheet'/>
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+  <link rel="stylesheet" href="css/chosen.css">
+
+<style>
+    body {
+		margin:0;
+		padding:0;
+		font-family: 'Open Sans', sans-serif;
+		width:100%;
+/*		max-width:800px;
+*/		margin: 0px auto;
+		display:table;
+	}
+
+	#header{
+		height:70px;
+		width:100%
+	}
+
+  #people {
+    font-size:12px;
+  }
+
+	.mapboxgl-ctrl-group .mapboxgl-ctrl-compass {
+		display: none;
+	}
+
+	@media (min-width: 599px) {
+		#map {
+			height: 700px;
+			width: 100%;
+		}
+
+		#selectNav {
+			position:absolute;
+			top:0px;
+			left:0px;
+			width:200px;
+			height:40px;
+			background-color:rgba(255,255,255,0.8);
+			z-index:1;
+		}
+
+		#keydiv {
+			position:absolute;
+			top:40px;
+			left:0px;
+			width:200px;
+			height:140px;
+			background-color:rgba(255,255,255,0.8);
+			z-index:1;
+		}
+
+		#currVal {
+			font-size:14px;
+
+		}
+	}
+
+	@media (max-width: 600px) {
+
+		 body {
+			height: 620px;
+		}
+
+	    #map {
+			position:absolute;
+			top:0px;
+			margin-top:120px;
+			height: 500px;
+			width: 100%;
+			overflow:visible;
+		}
+
+		#selectNav {
+			position:absolute;
+			top:-120px;
+			left:0px;
+			width:100%;
+			height:40px;
+			background-color:rgba(255,255,255,0.8);
+			z-index:3;
+		}
+
+		#keydiv {
+			position:absolute;
+			top:-80px;
+			left:0px;
+			width:100%;
+			height:80px;
+			background-color:rgba(255,255,255,0.8);
+			z-index:1;
+		}
+
+		#currVal {
+			font-size:14px;
+
+		}
+
+		.mapboxgl-ctrl-fullscreen {
+			display:none !important;
+		}
+	}
+
+
+.key /* required */
+{
+	display: inline-block;
+	margin: 0 0 1em 0;
+	padding: 0;
+	line-height: 15px;
+}
+.key .legendlabel {
+	white-space: nowrap;
+	margin-right: 13px;
+	font-size: 12px;
+	color: #333;
+	font-weight: normal;
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+.key .percentlabel {
+	white-space: nowrap;
+	margin-right: 13px;
+	font-size: 12px;
+	float: right;
+	color: #333;
+	font-weight: normal;
+	font-family: Arial, Helvetica, sans-serif;
+	text-align:right;
+}
+
+.key li/* required */
+{
+	/* margin: 2px 23px 2px 10px; */
+    padding: 0;
+    line-height: 15px;
+}
+.key b /* required */
+{
+	display: inline-block;
+	width: 35px;
+	height: 15px;
+	margin-right: 6px;
+	float: right;
+	background-color:none;
+	margin-top:8px;
+	border-radius:15px;
+}
+.legendBlocks{ /* new for Cluster chart */
+	width: 15px !important;
+	margin-top:0px !important;
+}
+.key legendlabel/* required */
+{
+	white-space: nowrap;
+	font-size: 12px;
+	color: #333;
+	font-weight: normal;
+}
+
+.key .percentlabel/* required */
+{
+	white-space: nowrap;
+	font-size: 12px;
+	width: 40px;
+	color: #333;
+	float:right;
+	font-weight: normal;
+}
+
+.key .legendRect {
+
+	float: left;
+    /*width: 10px;*/
+    height: 13px;
+    background-color: #666;
+}
+
+#pcText {
+			width: 130px;
+			height:20px;
+			padding: 3px;
+			color: #999999;
+}
+
+.btnEnable {
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 40px;
+    border: none;
+    padding: 6px 0;
+    background-color: #0084d1;
+    font: 700 16px Arial;
+    color: #FFF;
+    filter: inherit;
+    -webkit-appearance: button;
+    cursor: pointer;
+}
+
+</style>
+
+</head>
+<body>
+
+<div id='map'>
+	<div id='keydiv'></div>
+    <div id='selectNav'>
+      <form id="pcForm">
+                  	<input id="pcText" class="picaarticle" type="text" tabindex="1" placeholder="e.g. NP10 8XG">
+                 		<button class="btnEnable" id="submitPost" type="submit">GO!</button>
+      </form>
+    </div>
+
+
+</div>
+
+<!--<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://d3js.org/topojson.v1.min.js"></script>-->
+
+<script src="https://cdn.ons.gov.uk/vendor/d3/4.2.7/d3.min.js"></script>
+<script src="js/topojson.v2.min.js"></script>
+<script src="js/simple-statistics.min.js"></script>
+<script src="js/modernizr.min.js"></script>
+<script src="js/d3-queue.min.js"></script>
+<script src="js/colorbrewer.js"></script>
+<script src="https://cdn.ons.gov.uk/vendor/jquery/2.1.4/jquery.min.js"></script>
+<script src="js/chosen.jquery.js"></script>
+<script src="js/limit.js"></script>
+<script src="https://cdn.ons.gov.uk/vendor/pym/0.4.2/pym.min.js"></script>
+
+
+
+<!--<script src='js/mapbox-gl.js'></script>-->
+<script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.2/mapbox-gl.js'></script>
+
+
+<script src='js/turf.min.js'></script>
+<script src="js/script.js"></script>
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0], j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})
+(window,document,'script','dataLayer','GTM-MBCBVQS');
+</script>
+
+<noscript>
+<iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MBCBVQS" height="0" width="0" style="display:none;visibility:hidden"></iframe>
+</noscript>
+
+<noscript>
+	<p>Your browser does not support JavaScript. If you're able to please enable Javascript to view the map.</p>
+</noscript>
+
+</body>
+</html>

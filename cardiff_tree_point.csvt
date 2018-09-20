@@ -1,0 +1,2 @@
+id,left_green,right_green,left_car,right_car,left_build,right_build,road,way_id,seq,lon,lat,average_green,average_car,average_build,dominant,dominant_str
+"""Integer""","""Real""","""Real""","""Real""","""Real""","""Real""","""Real""","""String""","""Integer""","""Integer""","""Real""","""Real""","""Real""","""Real""","""Real""","""Real""","""String"""
