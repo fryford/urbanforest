@@ -84,20 +84,20 @@ if(Modernizr.webgl) {
 		"name": "circlepolygons",
 		"features": []};
 
+		points = {"type": "FeatureCollection",
+		"name": "points",
+		"features": []};
+
 		data.forEach(function(d,i) {
-
-			//console.log(d);
-			//{road: "New Zealand Road", way_id: "24298864", seq: "40", lon: "-3.18996", lat: "51.50022", …}
-
-
 
 				var center = [d.lon, d.lat];
 				var radius = 0.005;
 				var options = {steps: 6, units: 'kilometers', properties: {average_green: d.average_green*100, fill: color(d.average_green), road:d.road}};
 				var circle = turf.circle(center, radius, options);
+				var point = turf.point(center,options);
 
 				circles.features.push(circle);
-
+        points.features.push(point);
 				//var addToMap = [turf.point(center), circle]
 				// console.log(addToMap)
 
@@ -346,7 +346,7 @@ if(Modernizr.webgl) {
 
 		  //go on to filter
 
-			map.flyTo({center:[lng,lat], zoom:13, speed:0.7})
+			map.flyTo({center:[lng,lat], zoom:16, speed:0.7})
 
 			map.on('flystart', function(){
 				flying=true;
@@ -358,19 +358,16 @@ if(Modernizr.webgl) {
 
 			map.on('moveend',function(e){
 
-						setTimeout(function() {
-						//Translate lng lat coords to point on screen
-						point = map.project([lng,lat]);
-						//then check what features are underneath
-						var features = map.queryRenderedFeatures(point);
+				var targetPoint = turf.point([lng, lat]);
 
-						console.log(features)
+				var pointsturf = turf.featureCollection(points.features);
 
-						//then select area
-						//disableMouseEvents();
+				//then check what feature is nearest to the point
+				var nearestfeature = turf.nearestPoint(targetPoint, pointsturf);
 
-						map.setFilter("OApointshover", ["==", "oa11cd", features[0].properties.id]);
-					},500)
+				console.log(nearestfeature.properties.properties.road);
+				map.setFilter("areahover", ["==", "road", nearestfeature.properties.properties.road]);
+
 
 			});
 
