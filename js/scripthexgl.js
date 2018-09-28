@@ -553,9 +553,9 @@ if(Modernizr.webgl) {
 				);
 			}
 			//Temporary	hardcode unit text
-			dvc.unittext = "change in life expectancy";
+			//dvc.unittext = "change in life expectancy";
 
-			d3.select("#keydiv").append("p").attr("id","keyunit").style("margin-top","-10px").style("margin-left","10px").text(dvc.varunit);
+			//d3.select("#keydiv").append("p").attr("id","keyunit").style("margin-top","-10px").style("margin-left","10px").text(dvc.varunit);
 
 	} // Ends create key
 
