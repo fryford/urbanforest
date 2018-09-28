@@ -7,7 +7,7 @@
   <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
 
   <link href='css/mapbox-gl.css' rel='stylesheet'/>
-  <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700,800,900" rel="stylesheet">
   <link rel="stylesheet" href="css/chosen.css">
 
 <style>
@@ -15,10 +15,9 @@
 		margin:0;
 		padding:0;
 		font-family: 'Open Sans', sans-serif;
-		width:100%;
-/*		max-width:800px;
-*/		margin: 0px auto;
-		display:table;
+		/* width:100%; */
+    width:100%;
+    margin:0px auto;
 	}
 
 	#header{
@@ -33,26 +32,24 @@
 
 	@media (min-width: 599px) {
 		#map {
+      float:right;
 			height: 700px;
-			width: 100%;
+			width: 70%;
 		}
 
 		#selectNav {
-			position:absolute;
-			top:0px;
-			left:0px;
-			width:200px;
-			height:40px;
+      float:left;
+			width:calc(100% - 10px);
+			height:105px;
 			background-color:rgba(255,255,255,0.8);
 			z-index:1;
 		}
 
 		#keydiv {
-			position:absolute;
-			top:40px;
-			left:0px;
-			width:200px;
+      float:left;
+			width:30%;
 			height:140px;
+
 			background-color:rgba(255,255,255,0.8);
 			z-index:1;
 		}
@@ -61,6 +58,7 @@
 			font-size:14px;
 
 		}
+
 	}
 
 	@media (max-width: 600px) {
@@ -69,9 +67,7 @@
 			height: 620px;
 		}
 
-	    #map {
-			position:absolute;
-			top:0px;
+	  #map {
 			margin-top:120px;
 			height: 500px;
 			width: 100%;
@@ -83,7 +79,7 @@
 			top:-120px;
 			left:0px;
 			width:100%;
-			height:40px;
+			height:105px;
 			background-color:rgba(255,255,255,0.8);
 			z-index:3;
 		}
@@ -183,42 +179,80 @@
     background-color: #666;
 }
 
+
+
 #pcText {
-			width: 130px;
-			height:20px;
-			padding: 3px;
-			color: #999999;
+    width: 100%;
+    height: 40px;
+    color: #999999;
+    font-size: 16px;
+    box-sizing: border-box;
+    border: 2px solid #0075a3;
 }
 
 .btnEnable {
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    width: 40px;
-    border: none;
-    padding: 6px 0;
-    background-color: #0084d1;
-    font: 700 16px Arial;
-    color: #FFF;
-    filter: inherit;
-    -webkit-appearance: button;
-    cursor: pointer;
+      -moz-box-sizing: border-box;
+      box-sizing: border-box;
+      width: 40px;
+      height: 40px;
+      border: none;
+      padding: 0px 0!important;
+      background-color: #0075A3;
+      font: 700 16px Arial;
+      color: #FFF;
+      filter: inherit;
+      -webkit-appearance: button;
+      cursor: pointer;
+}
+
+#button-pic {
+    height: 30px;
+}
+#postcodetext {
+  margin: 15px 0px;
+  font-weight: bold;
+  color: #0075A3;
+}
+
+#street {
+
+  font-weight: bold;
+  font-size: 16px;
+  color:#0075A3;
+
+}
+
+#legenddiv {
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    width: 200px;
+    height: 80px;
+    z-index: 2;
+    background-color: rgba(255,255,255,0.7);
 }
 
 </style>
 
 </head>
 <body>
+<div id='keydiv'>
+  <div id='selectNav'>
+    <h4 id="postcodetext">Enter your postcode or click on the map</h4>
+    <form style="margin-top: 10px; height: 40px" id="pcForm">
+      <div style="display:inline;float:left;width:calc(100% - 40px)">
+        <input id="pcText" class="picaarticle" type="text" tabindex="1" placeholder="e.g. CF10 1BJ">
+      </div>
+      <div style="display:inline;float:right">
+        <button class="btnEnable" id="submitPost" type="submit"><img src="images/image.png" id="button-pic" alt=""></button>
+      </div>
+    </form>
+  </div>
+
+</div>
 
 <div id='map'>
-	<div id='keydiv'></div>
-    <div id='selectNav'>
-      <form id="pcForm">
-                  	<input id="pcText" class="picaarticle" type="text" tabindex="1" placeholder="e.g. NP10 8XG">
-                 		<button class="btnEnable" id="submitPost" type="submit">GO!</button>
-      </form>
-    </div>
-
-
+  <div id="legenddiv"></div>
 </div>
 
 <!--<script src="http://d3js.org/d3.v3.min.js"></script>

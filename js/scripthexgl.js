@@ -27,7 +27,8 @@ if(Modernizr.webgl) {
 
 		//Fire design functions
 		//selectlist(data);
-		createLegend(dvc);
+		createInfo(dvc);
+		createKey();
 
 		//Set up number formats
 		displayformat = d3.format("." + dvc.displaydecimals + "f");
@@ -42,7 +43,7 @@ if(Modernizr.webgl) {
 		  zoom: 13, // starting zoom
 		  maxZoom: 20,
 			minZoom: 13, //
-			pitch: 40.5,
+			pitch: 60,
 		  attributionControl: false
 		});
 		//add fullscreen option
@@ -59,11 +60,11 @@ if(Modernizr.webgl) {
 
 
 		// Add geolocation controls to the map.
-		map.addControl(new mapboxgl.GeolocateControl({
-			positionOptions: {
-				enableHighAccuracy: true
-			}
-		}));
+		// map.addControl(new mapboxgl.GeolocateControl({
+		// 	positionOptions: {
+		// 		enableHighAccuracy: true
+		// 	}
+		// }));
 
 		//add compact attribution
 		map.addControl(new mapboxgl.AttributionControl({
@@ -104,6 +105,21 @@ if(Modernizr.webgl) {
 
 		});
 
+		average_road = d3.nest()
+										.key(function(d) { return d.road; })
+										.rollup(function(values) { return d3.mean(values, function(d) {return +d.average_green; }) })
+										.map(data);
+
+
+
+		console.log(average_road)
+
+
+		roadRank = Object.keys(average_road).sort(function(a,b){return average_road[a]-average_road[b]})
+		console.log(roadRank);
+
+		numberRoads = roadRank.length;
+
 		map.on('load', function() {
 
 			map.addSource('area', { 'type': 'geojson', 'data': circles });
@@ -134,6 +150,7 @@ if(Modernizr.webgl) {
 				}
 			}, 'place_suburb');
 
+
 			map.addLayer({
 				'id': 'areahover',
 				'type': 'fill-extrusion',
@@ -156,120 +173,18 @@ if(Modernizr.webgl) {
 			}, 'place_suburb');
 
 
-			// map.addLayer({
-			// 	"id": "OAbounds",
-			// 	"type": "fill",
-			// 	"source": {
-			// 		"type": "vector",
-			// 		"tiles": ["https://maps.tilehosting.com/c/9b29dd2c-248e-459d-9dc5-28f4e358657d/data/OAethnicity/{z}/{x}/{y}.pbf.pict?key=7rA0yA362pBi9PZxyYlY"],
-			// 		"minzoom": 1,
-			// 		"maxzoom": 14
-			// 	},
-			// 	"minzoom": zoomThreshold,
-			// 	"source-layer": "OA_bound_ethnicity",
-			// 	"layout": {
-			// 		"visibility": "visible"
-			// 	},
-			// 	"paint": {
-			// 		"fill-outline-color": "rgb(0,0,0)",
-			// 		"fill-opacity": 0,
-			// 		"fill-color": "#fff"
-			// 	}
-			// }, 'place_suburb');
-
-			// Add Mapillary sequence layer.
-			// https://www.mapillary.com/developer/tiles-documentation/#sequence-layer
-			// map.addLayer({
-			// 	"id": "OApoints",
-			// 	'type': 'circle',
-			// 	"source": {
-			// 		"type": "vector",
-			// 		//"tiles": ["https://maps.tilehosting.com/c/9b29dd2c-248e-459d-9dc5-28f4e358657d/data/ethnicitydots4/{z}/{x}/{y}.pbf.pict?key=7rA0yA362pBi9PZxyYlY"],
-			// 		"tiles": ["http://localhost/vegetation_mapping/tiles/{z}/{x}/{y}.pbf"],
-			// 		"minzoom": 1,
-			// 		"maxzoom": 14
-			// 	},
-			// 	"source-layer": "cardiff_tree_points",
-			// 	'paint': {
-			// 		'circle-radius': {
-			// 			'base': 4,
-			// 			'stops': [[11, 1], [12, 1.5], [13, 2], [14, 2.5], [16, 10], [22, 180]]
-			// 		},
-			// 		'circle-opacity': 0.7,
-			// 		'circle-color': [
-			// 			'match',
-			// 			['get', 'dominant_str'],
-			// 			'building', '#377eb8',
-			// 			'car', '#ff7f00',
-			// 			'green', '#4daf4a',
-			// 			/* other */ '#e41a1c'
-			// 		]
-			// 	}
-			// }, 'place_suburb');
-			//
-			//
-			// map.addLayer({
-			// 	"id": "OApointshover",
-			// 	'type': 'circle',
-			// 	"source": {
-			// 		"type": "vector",
-			// 		//"tiles": ["https://maps.tilehosting.com/c/9b29dd2c-248e-459d-9dc5-28f4e358657d/data/ethnicitydots4/{z}/{x}/{y}.pbf.pict?key=7rA0yA362pBi9PZxyYlY"],
-			// 		"tiles": ["http://localhost/vegetation_mapping/tiles/{z}/{x}/{y}.pbf"],
-			// 		"minzoom": 1,
-			// 		"maxzoom": 14
-			// 	},
-			// 	"source-layer": "cardiff_tree_points",
-			// 	'paint': {
-			// 		'circle-radius': {
-			// 			'base': 4,
-			// 			'stops': [[11, 1.5], [12, 2.3], [13, 3], [14, 3.7], [16, 15], [22, 270]]
-			// 		},
-			// 		'circle-opacity': 1,
-			// 		'circle-stroke-width': 1,
-			// 		'circle-stroke-color': '#fff',
-			// 		'circle-color': [
-			// 			'match',
-			// 			['get', 'dominant_str'],
-			// 			'building', '#377eb8',
-			// 			'car', '#ff7f00',
-			// 			'green', '#4daf4a',
-			// 			/* other */ '#e41a1c'
-			// 		]
-			// 	},
-			// 	"filter": ["==", "id", ""]
-			// }, 'place_suburb');
-
-
-		// 	map.addLayer({
-		// 		"id": "OAboundshover",
-		// 		"type": "line",
-		// 		"source": {
-		// 			"type": "vector",
-		// 			"tiles": ["https://maps.tilehosting.com/c/9b29dd2c-248e-459d-9dc5-28f4e358657d/data/OAethnicity/{z}/{x}/{y}.pbf.pict?key=7rA0yA362pBi9PZxyYlY"],
-		// 			"minzoom": 1,
-		// 			"maxzoom": 14
-		// 		},
-		// 		"source-layer": "OA_bound_ethnicity",
-		// 		"minzoom": zoomThreshold,
-		// 		"layout": {
-		// 			"visibility": "visible"
-		// 		},
-		// 		"paint": {
-		// 			"line-color": "#fff",
-		// 			"line-width": 2
-		// 		},
-		// 		"filter": ["==", "oa11cd", ""]
-		// 	}, 'place_suburb');
-		//
-
-
-
-
 					//Highlight stroke on mouseover (and show area information)
 
-					map.on("click", "area", function(e) {
-						console.log(e.features[0].properties.road);
-						map.setFilter("areahover", ["==", "road", e.features[0].properties.road]);
+					map.on("click", function(e) {
+
+
+						//console.log(e.features[0].properties.road);
+					  console.log(e.lngLat);
+						setFilterRoad(e.lngLat.lat,e.lngLat.lng)
+						//console.log(e);
+						// map.setFilter("areahover", ["==", "road", e.features[0].properties.road]);
+						// d3.select("#street").html(e.features[0].properties.road + "<br>" + Math.round(e.features[0].properties.average_green) + "% vegetation");
+
 						//showAreaInfo(e.features[0].properties.AREANM, rateById[e.features[0].properties.AREACD]);
 
 					});
@@ -344,8 +259,6 @@ if(Modernizr.webgl) {
 
 		function success(lat,lng) {
 
-		  //go on to filter
-
 			map.flyTo({center:[lng,lat], zoom:16, speed:0.7})
 
 			map.on('flystart', function(){
@@ -356,23 +269,37 @@ if(Modernizr.webgl) {
 				flying=false;
 			});
 
-			map.on('moveend',function(e){
-
-				var targetPoint = turf.point([lng, lat]);
-
-				var pointsturf = turf.featureCollection(points.features);
-
-				//then check what feature is nearest to the point
-				var nearestfeature = turf.nearestPoint(targetPoint, pointsturf);
-
-				console.log(nearestfeature.properties.properties.road);
-				map.setFilter("areahover", ["==", "road", nearestfeature.properties.properties.road]);
-
-
-			});
-
+			setFilterRoad(lat,lng)
 
 		};
+
+		function setFilterRoad(lat,lng) {
+			//go on to filter
+			var targetPoint = turf.point([lng, lat]);
+			var pointsturf = turf.featureCollection(points.features);
+			//then check what feature is nearest to the point
+			var nearestfeature = turf.nearestPoint(targetPoint, pointsturf);
+
+
+			map.setFilter("areahover", ["==", "road", nearestfeature.properties.properties.road]);
+
+			roaddata = data.filter(function(d,i) {return d.road == nearestfeature.properties.properties.road})
+			console.log(roaddata.length)
+
+			average_road["$" + nearestfeature.properties.properties.road];
+
+
+			//Work out roadRank
+			rank = roadRank.indexOf("$" + nearestfeature.properties.properties.road);
+
+			console.log(roadRank);
+
+			d3.select("#street").html(nearestfeature.properties.properties.road + "<br>" + 	Math.round(average_road["$" + nearestfeature.properties.properties.road]*100) + "% vegetation <br> Ranked " + rank + " out of " + numberRoads + " streets in Cardiff"  )
+
+		}
+
+
+
 
 
 		function onMove(e) {
@@ -380,14 +307,13 @@ if(Modernizr.webgl) {
 
 				if(newAREACD != oldAREACD) {
 					oldAREACD = e.features[0].properties.id;
-					map.setFilter("OApointshover", ["==", "id", e.features[0].properties.id]);
+					//map.setFilter("OApointshover", ["==", "id", e.features[0].properties.id]);
 
 				//	console.log(e.features[0].properties);
 
 					buildings = displayformat((+e.features[0].properties["average_build"])*100);
 					cars = displayformat((+e.features[0].properties["average_car"])*100);
 					vegetation = displayformat((+e.features[0].properties["average_green"])*100);
-
 
 					percentages = [buildings, cars, vegetation];
 
@@ -420,18 +346,6 @@ if(Modernizr.webgl) {
 				hideaxisVal();
 		};
 
-		function onClick(e) {
-				disableMouseEvents();
-				newAREACD = e.features[0].properties.AREACD;
-
-				if(newAREACD != oldAREACD) {
-					oldAREACD = e.features[0].properties.AREACD;
-					map.setFilter("state-fills-hover", ["==", "AREACD", e.features[0].properties.AREACD]);
-
-					selectArea(e.features[0].properties.AREACD);
-					setAxisVal(e.features[0].properties.AREACD);
-				}
-		};
 
 		function disableMouseEvents() {
 				map.off("mousemove", "area", onMove);
@@ -493,39 +407,39 @@ if(Modernizr.webgl) {
 				.style("opacity",0)
 		}
 
-		function createLegend(keydata) {
+		function createInfo(keydata) {
 
 			//d3.select("#keydiv")
 			console.log(keydata);
 
-			d3.select('#keydiv').append("p").attr("id","people").text("placeholder");
+			d3.select('#keydiv').append("p").attr("id","street").text("");
 
-			legend = d3.select('#keydiv')
-				.append('ul')
-				.attr('class', 'key')
-				.selectAll('g')
-				.data(keydata.groups)
-				.enter()
-				.append('li')
-				//.style("background-color", function(d , i) { return dvc.essential.colour_palette[i]; })
-				.attr('class', function(d, i) { return 'key-item key-' + i + ' b '+ d.replace(' ', '-').toLowerCase(); })
-				.on("mouseover",function(d, i){
-					d3.selectAll(".key-item").style("opacity",0.2);
-					d3.selectAll(".key-" + i).style("opacity",1);
-				})
-				.on("mouseout",function(d, i){
-					d3.selectAll(".key-item").style("opacity",1);
-				})
-
-			legend.append('label').attr('class','legendlabel').text(function(d,i) {
-				var value = parseFloat(d).toFixed(1);
-				return d;
-			});
-
-			legend.append('div').style("width","40px").style("float","right").append("div").attr("class", "legendRect").attr("id",function(d,i){return "legendRect" + i}).style("width","0px");
-
-			legend.append('b').attr("class", "legendBlocks")
-				.style("background-color", function(d , i) { return keydata.colours[i]; });
+			// legend = d3.select('#keydiv')
+			// 	.append('ul')
+			// 	.attr('class', 'key')
+			// 	.selectAll('g')
+			// 	.data(keydata.groups)
+			// 	.enter()
+			// 	.append('li')
+			// 	//.style("background-color", function(d , i) { return dvc.essential.colour_palette[i]; })
+			// 	.attr('class', function(d, i) { return 'key-item key-' + i + ' b '+ d.replace(' ', '-').toLowerCase(); })
+			// 	.on("mouseover",function(d, i){
+			// 		d3.selectAll(".key-item").style("opacity",0.2);
+			// 		d3.selectAll(".key-" + i).style("opacity",1);
+			// 	})
+			// 	.on("mouseout",function(d, i){
+			// 		d3.selectAll(".key-item").style("opacity",1);
+			// 	})
+			//
+			// legend.append('label').attr('class','legendlabel').text(function(d,i) {
+			// 	var value = parseFloat(d).toFixed(1);
+			// 	return d;
+			// });
+			//
+			// legend.append('div').style("width","40px").style("float","right").append("div").attr("class", "legendRect").attr("id",function(d,i){return "legendRect" + i}).style("width","0px");
+			//
+			// legend.append('b').attr("class", "legendBlocks")
+			// 	.style("background-color", function(d , i) { return keydata.colours[i]; });
 
 
 
@@ -533,20 +447,21 @@ if(Modernizr.webgl) {
 
 		}
 
-		function createKey(config){
+		function createKey(){
 
-			keywidth = d3.select("#keydiv").node().getBoundingClientRect().width;
+			keywidth = d3.select("#legenddiv").node().getBoundingClientRect().width;
 
-			var svgkey = d3.select("#keydiv")
+			var svgkey = d3.select("#legenddiv")
 				.append("svg")
 				.attr("id", "key")
 				.attr("width", keywidth)
 				.attr("height",65);
 
+			breaks = [0,20,40,60,80,100];
 
 			var color = d3.scaleThreshold()
-			   .domain(breaks)
-			   .range(colour);
+			   .domain([0,20,40,60,80,100])
+			   .range(colorbrewer.PuBuGn[5]);
 
 			// Set up scales for legend
 			x = d3.scaleLinear()
@@ -555,12 +470,12 @@ if(Modernizr.webgl) {
 
 
 			var xAxis = d3.axisBottom(x)
-				.tickSize(15)
+				.tickSize(5)
 				.tickValues(color.domain())
-				.tickFormat(legendformat);
+			//	.tickFormat(legendformat);
 
 			var g2 = svgkey.append("g").attr("id","horiz")
-				.attr("transform", "translate(15,30)");
+				.attr("transform", "translate(15,50)");
 
 
 			keyhor = d3.select("#horiz");
@@ -576,7 +491,8 @@ if(Modernizr.webgl) {
 				}))
 			  .enter().append("rect")
 				.attr("class", "blocks")
-				.attr("height", 8)
+				.attr("height", function(d,i){return 8*(i+1)})
+				.attr("transform", function(d,i){return "translate(0," + -8*(i+1) +")"})
 				.attr("x", function(d) {
 					 return d.x0; })
 				.attr("width", function(d) {return d.x1 - d.x0; })
