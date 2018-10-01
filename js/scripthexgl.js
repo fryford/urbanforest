@@ -19,6 +19,7 @@ if(Modernizr.webgl) {
 		//Set up global variables
 		dvc = config.ons;
 		oldAREACD = "";
+		var draw = true;
 
 
 		//set title of page
@@ -112,11 +113,9 @@ if(Modernizr.webgl) {
 
 
 
-		console.log(average_road)
 
 
 		roadRank = Object.keys(average_road).sort(function(a,b){return average_road[a]-average_road[b]})
-		console.log(roadRank);
 
 		numberRoads = roadRank.length;
 
@@ -179,7 +178,6 @@ if(Modernizr.webgl) {
 
 
 						//console.log(e.features[0].properties.road);
-					  console.log(e.lngLat);
 						setFilterRoad(e.lngLat.lat,e.lngLat.lng)
 						//console.log(e);
 						// map.setFilter("areahover", ["==", "road", e.features[0].properties.road]);
@@ -224,7 +222,6 @@ if(Modernizr.webgl) {
 
 			function getCodes(myPC)	{
 
-				console.log(myPC);
 
 					var myURIstring=encodeURI("https://api.postcodes.io/postcodes/"+myPC);
 					$.support.cors = true;
@@ -240,7 +237,6 @@ if(Modernizr.webgl) {
 							},
 						success: function(data1){
 							if(data1.status == 200 ){
-								console.log(data1);
 								//$("#pcError").hide();
 								lat =data1.result.latitude;
 								lng = data1.result.longitude;
@@ -284,7 +280,6 @@ if(Modernizr.webgl) {
 			map.setFilter("areahover", ["==", "road", nearestfeature.properties.properties.road]);
 
 			roaddata = data.filter(function(d,i) {return d.road == nearestfeature.properties.properties.road})
-			console.log(roaddata.length)
 
 			average_road["$" + nearestfeature.properties.properties.road];
 
@@ -292,12 +287,94 @@ if(Modernizr.webgl) {
 			//Work out roadRank
 			rank = roadRank.indexOf("$" + nearestfeature.properties.properties.road);
 
-			console.log(roadRank);
-
 			d3.select("#street").html(nearestfeature.properties.properties.road + "<br>" + 	Math.round(average_road["$" + nearestfeature.properties.properties.road]*100) + "% vegetation <br> Ranked " + rank + " out of " + numberRoads + " streets in Cardiff"  )
-
+			drawArc(average_road["$" + nearestfeature.properties.properties.road]);
 		}
 
+		function drawArc(percentage) {
+
+			var tau = 2 * Math.PI;
+
+			if(draw) {
+
+			draw = false;
+
+			// An arc function with all values bound except the endAngle.
+			arc = d3.arc()
+			    .innerRadius((keydivwidth/4)-40)
+			    .outerRadius((keydivwidth/4)-20)
+			    .startAngle(0);
+
+			// Get the SVG container, and apply a transform such that the origin is the center of the canvas.
+			var svg = d3.select("#keydiv").select("svg"),
+			    width = +svg.attr("width"),
+			    height = +svg.attr("height");
+
+			g = svg.append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+			// Add the background arc, from 0 to 100% (tau).
+			var background = g.append("path")
+			    .datum({endAngle: tau})
+			    .style("fill", "#ddd")
+			    .attr("d", arc);
+
+			// Add the foreground arc
+			foreground = g.append("path")
+			    .datum({endAngle: 0})
+			    .style("fill", "#6cb743")
+			    .attr("d", arc);
+
+			// add centre text
+			g.append("text")
+			  .datum({value: 0})
+	      .attr("x", 0)
+	      .attr("y", 15)
+				.attr("text-anchor","middle")
+				.attr("fill","#0075A3")
+				.attr("font-size","40px")
+				.attr("font-weight","bold")
+	      .text(0);
+
+			format = d3.format(",.0%");
+
+
+			}
+
+			foreground.transition()
+		      .duration(750)
+		      .attrTween("d", arcTween(percentage * tau));
+
+
+
+
+			update(percentage)
+
+		  function update(newValue){
+					  g.select("text")
+					    .transition()
+					      .duration(750)
+					      .on("start", function repeat() {
+					        d3.active(this)
+					            .tween("text", function(d) {
+					              var that = d3.select(this),
+					                  i = d3.interpolateNumber(d.value, newValue);
+					              return function(t) { that.text(format(i(t))); };
+					            })
+					      }).on("end", function() {
+					    	d3.select(this).datum({value: newValue})
+					  })
+			}
+
+			function arcTween(newAngle) {
+			  return function(d) {
+			    var interpolate = d3.interpolate(d.endAngle, newAngle);
+			    return function(t) {
+			      d.endAngle = interpolate(t);
+			      return arc(d);
+			    };
+			  };
+			}
+		}
 
 
 
@@ -410,9 +487,13 @@ if(Modernizr.webgl) {
 		function createInfo(keydata) {
 
 			//d3.select("#keydiv")
-			console.log(keydata);
+			//console.log(keydata);
 
 			d3.select('#keydiv').append("p").attr("id","street").text("");
+
+			keydivwidth = parseInt(d3.select("#keydiv").style("width"));
+
+			d3.select('#keydiv').append("svg").attr("width",keydivwidth/2).attr("height",keydivwidth/2)
 
 			// legend = d3.select('#keydiv')
 			// 	.append('ul')
