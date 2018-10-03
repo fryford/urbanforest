@@ -39,7 +39,8 @@ if(Modernizr.webgl) {
 		map = new mapboxgl.Map({
 		  container: 'map', // container id
 		 // style: style,
-		  style: 'https://free.tilehosting.com/styles/positron/style.json?key=ZBXiR1SHvcgszCLwyOFe', //stylesheet location
+		 //Qi2gszp5uSG09U66VCvH
+		  style: 'https://maps.tilehosting.com/styles/positron/style.json?key=7rA0yA362pBi9PZxyYlY', //stylesheet location
 		  center: [-3.1750, 51.488224], // starting position
 		  zoom: 13, // starting zoom
 		  maxZoom: 20,
@@ -179,6 +180,7 @@ if(Modernizr.webgl) {
 
 						//console.log(e.features[0].properties.road);
 						setFilterRoad(e.lngLat.lat,e.lngLat.lng)
+						d3.select("#keydiv").attr("height","auto");
 						//console.log(e);
 						// map.setFilter("areahover", ["==", "road", e.features[0].properties.road]);
 						// d3.select("#street").html(e.features[0].properties.road + "<br>" + Math.round(e.features[0].properties.average_green) + "% vegetation");
@@ -194,7 +196,7 @@ if(Modernizr.webgl) {
 						event.preventDefault();
 						event.stopPropagation();
 						myValue=$("#pcText").val();
-
+						d3.select("#keydiv").style("height","auto");
 						getCodes(myValue);
 		});
 
@@ -287,8 +289,11 @@ if(Modernizr.webgl) {
 			//Work out roadRank
 			rank = roadRank.indexOf("$" + nearestfeature.properties.properties.road);
 
-			d3.select("#street").html(nearestfeature.properties.properties.road + "<br>" + 	Math.round(average_road["$" + nearestfeature.properties.properties.road]*100) + "% vegetation <br> Ranked " + rank + " out of " + numberRoads + " streets in Cardiff"  )
+			d3.select("#street").html(nearestfeature.properties.properties.road)
 			drawArc(average_road["$" + nearestfeature.properties.properties.road]);
+			drawIllustration(average_road["$" + nearestfeature.properties.properties.road]*100);
+
+		//	if
 		}
 
 		function drawArc(percentage) {
@@ -301,12 +306,12 @@ if(Modernizr.webgl) {
 
 			// An arc function with all values bound except the endAngle.
 			arc = d3.arc()
-			    .innerRadius((keydivwidth/4)-40)
-			    .outerRadius((keydivwidth/4)-20)
+			    .innerRadius((keydivwidth/4)-20)
+			    .outerRadius((keydivwidth/4))
 			    .startAngle(0);
 
 			// Get the SVG container, and apply a transform such that the origin is the center of the canvas.
-			var svg = d3.select("#keydiv").select("svg"),
+			var svg = d3.select("#keydiv").select(".score"),
 			    width = +svg.attr("width"),
 			    height = +svg.attr("height");
 
@@ -328,12 +333,21 @@ if(Modernizr.webgl) {
 			g.append("text")
 			  .datum({value: 0})
 	      .attr("x", 0)
-	      .attr("y", 15)
+	      .attr("y", 5)
 				.attr("text-anchor","middle")
 				.attr("fill","#0075A3")
 				.attr("font-size","40px")
 				.attr("font-weight","bold")
 	      .text(0);
+
+			g.append("text")
+					.attr("x", 0)
+					.attr("y", 28)
+					.attr("text-anchor","middle")
+					.attr("fill","#0075A3")
+					.attr("font-size","20px")
+					.attr("font-weight","bold")
+					.text("green");
 
 			format = d3.format(",.0%");
 
@@ -377,7 +391,21 @@ if(Modernizr.webgl) {
 		}
 
 
+		function drawIllustration(percentage) {
+			d3.select(".illustration").select("img").remove();
+			if(percentage <= 20) {
+					d3.select(".illustration").append("img").attr("src","images/urbanforest1.svg");
+			} else if (percentage <= 40) {
+					d3.select(".illustration").append("img").attr("src","images/urbanforest2.svg");
+			} else if (percentage <= 60) {
+					d3.select(".illustration").append("img").attr("src","images/urbanforest3.svg");
+			} else if (percentage <= 80) {
+					d3.select(".illustration").append("img").attr("src","images/urbanforest4.svg");
+			} else {
+					d3.select(".illustration").append("img").attr("src","images/urbanforest5.svg");
+			}
 
+		}
 
 		function onMove(e) {
 				newAREACD = e.features[0].properties.id;
@@ -493,34 +521,9 @@ if(Modernizr.webgl) {
 
 			keydivwidth = parseInt(d3.select("#keydiv").style("width"));
 
-			d3.select('#keydiv').append("svg").attr("width",keydivwidth/2).attr("height",keydivwidth/2)
 
-			// legend = d3.select('#keydiv')
-			// 	.append('ul')
-			// 	.attr('class', 'key')
-			// 	.selectAll('g')
-			// 	.data(keydata.groups)
-			// 	.enter()
-			// 	.append('li')
-			// 	//.style("background-color", function(d , i) { return dvc.essential.colour_palette[i]; })
-			// 	.attr('class', function(d, i) { return 'key-item key-' + i + ' b '+ d.replace(' ', '-').toLowerCase(); })
-			// 	.on("mouseover",function(d, i){
-			// 		d3.selectAll(".key-item").style("opacity",0.2);
-			// 		d3.selectAll(".key-" + i).style("opacity",1);
-			// 	})
-			// 	.on("mouseout",function(d, i){
-			// 		d3.selectAll(".key-item").style("opacity",1);
-			// 	})
-			//
-			// legend.append('label').attr('class','legendlabel').text(function(d,i) {
-			// 	var value = parseFloat(d).toFixed(1);
-			// 	return d;
-			// });
-			//
-			// legend.append('div').style("width","40px").style("float","right").append("div").attr("class", "legendRect").attr("id",function(d,i){return "legendRect" + i}).style("width","0px");
-			//
-			// legend.append('b').attr("class", "legendBlocks")
-			// 	.style("background-color", function(d , i) { return keydata.colours[i]; });
+			d3.select('#keydiv').append("svg").attr("class","score").attr("width",keydivwidth/2).attr("height",keydivwidth/2)
+			d3.select('#keydiv').append("div").attr("class","illustration").style("width",keydivwidth/2).style("width",keydivwidth/2 +"px").style("height",keydivwidth/2 +"px").style("float","right")
 
 
 
