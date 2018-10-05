@@ -1,5 +1,5 @@
 {"ons":{
-"maptitle": "map about life expectancy",
+"maptitle": "How green is your street?",
 "varcolour": "PuBu",
 "varunit": "change in months",
 "groups":["buildings","cars","vegetation"],

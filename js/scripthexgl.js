@@ -289,7 +289,7 @@ if(Modernizr.webgl) {
 			//Work out roadRank
 			rank = roadRank.indexOf("$" + nearestfeature.properties.properties.road);
 
-			d3.select("#street").html(nearestfeature.properties.properties.road)
+			d3.select("#street").html("How green is your street? <br><span>" +nearestfeature.properties.properties.road + "</span>")
 			drawArc(average_road["$" + nearestfeature.properties.properties.road]);
 			drawIllustration(average_road["$" + nearestfeature.properties.properties.road]*100);
 
@@ -306,8 +306,8 @@ if(Modernizr.webgl) {
 
 			// An arc function with all values bound except the endAngle.
 			arc = d3.arc()
-			    .innerRadius((keydivwidth/4)-20)
-			    .outerRadius((keydivwidth/4))
+			    .innerRadius((keydivwidth/4)-25)
+			    .outerRadius((keydivwidth/4)-10)
 			    .startAngle(0);
 
 			// Get the SVG container, and apply a transform such that the origin is the center of the canvas.
@@ -315,7 +315,7 @@ if(Modernizr.webgl) {
 			    width = +svg.attr("width"),
 			    height = +svg.attr("height");
 
-			g = svg.append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+			g = svg.append("g").attr("transform", "translate(" + width / 2 + "," + ((height / 2) + 10) + ")");
 
 			// Add the background arc, from 0 to 100% (tau).
 			var background = g.append("path")
@@ -575,8 +575,8 @@ if(Modernizr.webgl) {
 				}))
 			  .enter().append("rect")
 				.attr("class", "blocks")
-				.attr("height", function(d,i){return 8*(i+1)})
-				.attr("transform", function(d,i){return "translate(0," + -8*(i+1) +")"})
+				.attr("height", function(d,i){return 5*(i+1)})
+				.attr("transform", function(d,i){return "translate(0," + -5*(i+1) +")"})
 				.attr("x", function(d) {
 					 return d.x0; })
 				.attr("width", function(d) {return d.x1 - d.x0; })
