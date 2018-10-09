@@ -78,8 +78,14 @@ if(Modernizr.webgl) {
 		//addFullscreen();
 
 		color = d3.scaleThreshold()
-				.domain([0,0.20,0.40,0.60,0.80,1.0])
-				.range(colorbrewer.PuBuGn[5]);
+				.domain([0.20,0.40,0.60,0.80,1.0])
+				.range(colorbrewer.YlGn[5]);
+
+		console.log(color(0.1));
+		console.log(color(0.3));
+		console.log(color(0.5));
+		console.log(color(0.7));
+		console.log(color(0.9));
 
 		//Loop to generate circle/hexagon for each point in the data
 
@@ -107,16 +113,23 @@ if(Modernizr.webgl) {
 
 		});
 
+
+		//work out the average green for each uniquely named road in the city.
 		average_road = d3.nest()
 										.key(function(d) { return d.road; })
 										.rollup(function(values) { return d3.mean(values, function(d) {return +d.average_green; }) })
 										.map(data);
 
+		//work out the average green for the whole dataset
+		average_city = d3.median(data, function(d) { return +d.average_green; });
+
+		console.log(average_city)
 
 
 
 
-		roadRank = Object.keys(average_road).sort(function(a,b){return average_road[a]-average_road[b]})
+
+		roadRank = Object.keys(average_road).sort(function(a,b){return average_road[b]-average_road[a]})
 
 		numberRoads = roadRank.length;
 
@@ -289,9 +302,14 @@ if(Modernizr.webgl) {
 			//Work out roadRank
 			rank = roadRank.indexOf("$" + nearestfeature.properties.properties.road);
 
+			percentile = rank/numberRoads;
+
+			console.log(percentile)
+
 			d3.select("#street").html("How green is your street? <br><span>" +nearestfeature.properties.properties.road + "</span>")
 			drawArc(average_road["$" + nearestfeature.properties.properties.road]);
 			drawIllustration(average_road["$" + nearestfeature.properties.properties.road]*100);
+			drawContext(average_road["$" + nearestfeature.properties.properties.road]*100, average_city, percentile);
 
 		//	if
 		}
@@ -310,6 +328,17 @@ if(Modernizr.webgl) {
 			    .outerRadius((keydivwidth/4)-10)
 			    .startAngle(0);
 
+			innerarc = d3.arc()
+					.innerRadius((keydivwidth/4)-22)
+					.outerRadius((keydivwidth/4)-13)
+					.startAngle(0);
+
+			averagearc = d3.arc()
+			    .innerRadius((keydivwidth/4)-25)
+			    .outerRadius((keydivwidth/4)-6)
+			    .startAngle(average_city * tau)
+					.endAngle((average_city * tau) +0.05);
+
 			// Get the SVG container, and apply a transform such that the origin is the center of the canvas.
 			var svg = d3.select("#keydiv").select(".score"),
 			    width = +svg.attr("width"),
@@ -319,15 +348,22 @@ if(Modernizr.webgl) {
 
 			// Add the background arc, from 0 to 100% (tau).
 			var background = g.append("path")
-			    .datum({endAngle: tau})
+					.datum({endAngle: tau})
 			    .style("fill", "#ddd")
-			    .attr("d", arc);
+			    .attr("d", innerarc);
+
 
 			// Add the foreground arc
 			foreground = g.append("path")
 			    .datum({endAngle: 0})
 			    .style("fill", "#6cb743")
 			    .attr("d", arc);
+
+			// Add the average arc
+			var foregroundaverage = g.append("path")
+					.style("fill", "#00722F")
+					.attr("d", averagearc);
+
 
 			// add centre text
 			g.append("text")
@@ -404,6 +440,41 @@ if(Modernizr.webgl) {
 			} else {
 					d3.select(".illustration").append("img").attr("src","images/urbanforest5.svg");
 			}
+
+		}
+
+		function drawContext(percentage,city, percentile){
+				d3.select('.context').html("&#124; Cardiff average " + Math.round(city*100) + "%" );
+
+				city = "Cardiff";
+
+				//work out percent roads better/worse/top/bottom
+				if(percentile <0.1) {
+					 message = "Your road in the <span style='font-weight:bold'>top 10% greenest in " + city + "</span>";
+				} else if(percentile < 0.2) {
+           message = "There are around <span style='font-weight:bold'>10% roads greener than yours in " + city + "</span>";
+				} else if(percentile < 0.3) {
+           message = "There are around <span style='font-weight:bold'>20% roads greener than yours in " + city + "</span>";
+				} else if(percentile < 0.4) {
+						message = "There are around <span style='font-weight:bold'>30% roads greener than yours in " + city + "</span>";
+				} else if(percentile < 0.5) {
+						message = "Your road is about <span style='font-weight:bold'>average green in " + city + "</span>";
+				} else if(percentile < 0.6) {
+						message = "Your road is about <span style='font-weight:bold'>average green in " + city + "</span>";
+				} else if(percentile < 0.7) {
+						message = "There are around <span style='font-weight:bold'>30% roads less green than yours in " + city + "</span>";
+			  } else if(percentile < 0.8) {
+            message = "There are around <span style='font-weight:bold'>20% roads less green than yours in " + city + "</span>";
+				} else if(percentile < 0.9) {
+						message = "There are around <span style='font-weight:bold'>10% roads less green than yours in " + city + "</span>";
+				} else {
+						message = "Your road in the <span style='font-weight:bold'>bottom 10% least green in " + city + "</span>";
+				}
+
+
+				d3.select('.context2').html(message);
+
+
 
 		}
 
@@ -522,9 +593,10 @@ if(Modernizr.webgl) {
 			keydivwidth = parseInt(d3.select("#keydiv").style("width"));
 
 
-			d3.select('#keydiv').append("svg").attr("class","score").attr("width",keydivwidth/2).attr("height",keydivwidth/2)
-			d3.select('#keydiv').append("div").attr("class","illustration").style("width",keydivwidth/2).style("width",keydivwidth/2 +"px").style("height",keydivwidth/2 +"px").style("float","right")
-
+			d3.select('#keydiv').append("svg").attr("class","score").attr("width",keydivwidth/2).attr("height",keydivwidth/2);
+			d3.select('#keydiv').append("div").attr("class","illustration").style("width",keydivwidth/2 +"px").style("height",keydivwidth/2 +"px").style("float","right");
+			d3.select('#keydiv').append("div").attr("class","context").style("width",keydivwidth +"px");
+			d3.select('#keydiv').append("div").attr("class","context2").style("width",keydivwidth +"px");
 
 
 
@@ -545,7 +617,9 @@ if(Modernizr.webgl) {
 
 			var color = d3.scaleThreshold()
 			   .domain([0,20,40,60,80,100])
-			   .range(colorbrewer.PuBuGn[5]);
+			   .range(colorbrewer.YlGn[5]);
+
+			console.log(color(30));
 
 			// Set up scales for legend
 			x = d3.scaleLinear()
