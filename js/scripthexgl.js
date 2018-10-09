@@ -81,12 +81,6 @@ if(Modernizr.webgl) {
 				.domain([0.20,0.40,0.60,0.80,1.0])
 				.range(colorbrewer.YlGn[5]);
 
-		console.log(color(0.1));
-		console.log(color(0.3));
-		console.log(color(0.5));
-		console.log(color(0.7));
-		console.log(color(0.9));
-
 		//Loop to generate circle/hexagon for each point in the data
 
 		circles = {"type": "FeatureCollection",
@@ -122,12 +116,6 @@ if(Modernizr.webgl) {
 
 		//work out the average green for the whole dataset
 		average_city = d3.median(data, function(d) { return +d.average_green; });
-
-		console.log(average_city)
-
-
-
-
 
 		roadRank = Object.keys(average_road).sort(function(a,b){return average_road[b]-average_road[a]})
 
@@ -214,27 +202,6 @@ if(Modernizr.webgl) {
 		});
 
 
-		//	map.on("mousemove", "OApoints", onMove);
-
-
-			//Work out zoom level and update
-			// map.on("moveend", function (e) {
-			// 	zoom = parseInt(map.getZoom());
-			//
-			// 	baselevel = 13;
-			// 	numberperdotlowest = 10;
-			// 	dropdensity = 2;
-			//
-			// 	if(zoom < baselevel) {
-			// 		thepowerof = (baselevel - zoom);
-			// 		numberperdot = numberperdotlowest * Math.pow(dropdensity,thepowerof);
-			//
-			// 		d3.select("#people").text("1 dot = ~" +  (numberperdot).toLocaleString('en-GB') + " people")
-			// 	} else {
-			// 		d3.select("#people").text("1 dot = ~10 people")
-			// 	}
-			// });
-
 			function getCodes(myPC)	{
 
 
@@ -270,7 +237,7 @@ if(Modernizr.webgl) {
 
 		function success(lat,lng) {
 
-			map.flyTo({center:[lng,lat], zoom:16, speed:0.7})
+			map.flyTo({center:[lng,lat], zoom:15, speed:0.7})
 
 			map.on('flystart', function(){
 				flying=true;
@@ -304,12 +271,10 @@ if(Modernizr.webgl) {
 
 			percentile = rank/numberRoads;
 
-			console.log(percentile)
-
 			d3.select("#street").html("How green is your street? <br><span>" +nearestfeature.properties.properties.road + "</span>")
 			drawArc(average_road["$" + nearestfeature.properties.properties.road]);
 			drawIllustration(average_road["$" + nearestfeature.properties.properties.road]*100);
-			drawContext(average_road["$" + nearestfeature.properties.properties.road]*100, average_city, percentile);
+			drawContext(average_road["$" + nearestfeature.properties.properties.road]*100, average_city, percentile, nearestfeature.geometry.coordinates);
 
 		//	if
 		}
@@ -443,7 +408,7 @@ if(Modernizr.webgl) {
 
 		}
 
-		function drawContext(percentage,city, percentile){
+		function drawContext(percentage,city, percentile,coords){
 				d3.select('.context').html("&#124; Cardiff average " + Math.round(city*100) + "%" );
 
 				city = "Cardiff";
@@ -472,9 +437,16 @@ if(Modernizr.webgl) {
 				}
 
 
+
 				d3.select('.context2').html(message);
 
+				d3.select(".streetview").select("a").remove();
 
+				d3.select('.streetview').append("a").attr("href","http://maps.google.com/maps?q=&layer=c&cbll=" + +coords[1] +"," + +coords[0] + "&cbp=11,0,0,0,0").attr("target","_blank").text("Goto streetview");
+
+				//add google street view link
+
+				//http://maps.google.com/maps?q=&layer=c&cbll=31.335198,-89.287204&cbp=11,0,0,0,0
 
 		}
 
@@ -484,8 +456,6 @@ if(Modernizr.webgl) {
 				if(newAREACD != oldAREACD) {
 					oldAREACD = e.features[0].properties.id;
 					//map.setFilter("OApointshover", ["==", "id", e.features[0].properties.id]);
-
-				//	console.log(e.features[0].properties);
 
 					buildings = displayformat((+e.features[0].properties["average_build"])*100);
 					cars = displayformat((+e.features[0].properties["average_car"])*100);
@@ -597,6 +567,7 @@ if(Modernizr.webgl) {
 			d3.select('#keydiv').append("div").attr("class","illustration").style("width",keydivwidth/2 +"px").style("height",keydivwidth/2 +"px").style("float","right");
 			d3.select('#keydiv').append("div").attr("class","context").style("width",keydivwidth +"px");
 			d3.select('#keydiv').append("div").attr("class","context2").style("width",keydivwidth +"px");
+			d3.select('#keydiv').append("div").attr("class","streetview").style("width",keydivwidth +"px");
 
 
 
@@ -618,8 +589,6 @@ if(Modernizr.webgl) {
 			var color = d3.scaleThreshold()
 			   .domain([0,20,40,60,80,100])
 			   .range(colorbrewer.YlGn[5]);
-
-			console.log(color(30));
 
 			// Set up scales for legend
 			x = d3.scaleLinear()
@@ -767,56 +736,6 @@ if(Modernizr.webgl) {
 
 		navigator.geolocation.getCurrentPosition(success, error, options);
 	}
-
-
-
-		function selectlist(datacsv) {
-
-			var areacodes =  datacsv.map(function(d) { return d.AREACD; });
-			var areanames =  datacsv.map(function(d) { return d.AREANM; });
-			var menuarea = d3.zip(areanames,areacodes).sort(function(a, b){ return d3.ascending(a[0], b[0]); });
-
-			// Build option menu for occupations
-			var optns = d3.select("#selectNav").append("div").attr("id","sel").append("select")
-				.attr("id","areaselect")
-				.attr("style","width:98%")
-				.attr("class","chosen-select");
-
-
-			optns.append("option")
-				.attr("value","first")
-				.text("");
-
-			optns.selectAll("p").data(menuarea).enter().append("option")
-				.attr("value", function(d){ return d[1]})
-				.text(function(d){ return d[0]});
-
-			myId=null;
-
-			$('#areaselect').chosen({width: "98%", allow_single_deselect:true}).on('change',function(evt,params){
-
-					if(typeof params != 'undefined') {
-
-							disableMouseEvents();
-
-							map.setFilter("state-fills-hover", ["==", "AREACD", params.selected]);
-
-							selectArea(params.selected);
-							setAxisVal(params.selected);
-
-							zoomToArea(params.selected);
-
-					}
-					else {
-							enableMouseEvents();
-							hideaxisVal();
-							onLeave();
-							resetZoom();
-					}
-
-			});
-
-	};
 
 	}
 
