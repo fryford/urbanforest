@@ -335,19 +335,18 @@ if(Modernizr.webgl) {
 			  .datum({value: 0})
 	      .attr("x", 0)
 	      .attr("y", 5)
+				.attr("class","percentgreen")
 				.attr("text-anchor","middle")
 				.attr("fill","#0075A3")
-				.attr("font-size","40px")
 				.attr("font-weight","bold")
 	      .text(0);
 
 			g.append("text")
 					.attr("x", 0)
 					.attr("y", 28)
+					.attr("class","textgreen")
 					.attr("text-anchor","middle")
 					.attr("fill","#0075A3")
-					.attr("font-size","20px")
-					.attr("font-weight","bold")
 					.text("green");
 
 			format = d3.format(",.0%");
@@ -442,7 +441,7 @@ if(Modernizr.webgl) {
 
 				d3.select(".streetview").select("a").remove();
 
-				d3.select('.streetview').append("a").attr("href","http://maps.google.com/maps?q=&layer=c&cbll=" + +coords[1] +"," + +coords[0] + "&cbp=11,0,0,0,0").attr("target","_blank").text("Goto streetview");
+				d3.select('.streetview').append("a").attr("href","http://maps.google.com/maps?q=&layer=c&cbll=" + +coords[1] +"," + +coords[0] + "&cbp=11,0,0,0,0").text("Goto Google Streetview")//.attr("target","_blank");
 
 				//add google street view link
 

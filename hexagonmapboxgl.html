@@ -30,7 +30,7 @@
   }
 
 
-	@media (min-width: 599px) {
+	@media (min-width: 600px) {
 		#map {
       float:right;
 			height: 550px;
@@ -60,7 +60,9 @@
 
 	}
 
-	@media (max-width: 600px) {
+
+
+	@media (max-width: 599px) {
 
 		 body {
 			height: 620px;
@@ -252,6 +254,60 @@
     height: 80px;
     z-index: 2;
     background-color: rgba(255,255,255,0.7);
+}
+
+.percentgreen {
+  font-size: 40px;
+  font-weight: bold;
+}
+
+.textgreen {
+  font-size: 20px;
+  font-weight: 400;
+}
+
+@media (min-width: 600px) and (max-width: 700px) {
+
+
+  #street {
+    font-size: 16px;
+    font-weight: bold;
+  }
+
+  #street span {
+    font-size: 16px;
+    font-weight: 400;
+
+  }
+
+  .percentgreen {
+    font-size: 16px;
+    font-weight: bold;
+    transform: translate(0px, -7px)
+  }
+
+  .textgreen {
+    font-size: 14px;
+    font-weight: 400;
+    transform: translate(0px, -15px)
+  }
+
+}
+
+@media (min-width: 701px) and (max-width: 799px) {
+
+  .percentgreen {
+    font-size: 24px;
+    font-weight: bold;
+    transform: translate(0px, -7px)
+  }
+
+  .textgreen {
+    font-size: 16px;
+    font-weight: 400;
+    transform: translate(0px, -15px)
+  }
+
 }
 
 </style>
