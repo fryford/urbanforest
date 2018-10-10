@@ -54,7 +54,9 @@
 		}
 
 		#currVal {
+      fill: #666;
 			font-size:14px;
+      font-family: 'Open Sans', sans-serif;
 
 		}
 
@@ -178,8 +180,9 @@
 #pcText {
     width: 100%;
     height: 40px;
-    color: #999999;
+    color: #666;
     font-size: 16px;
+    padding-left:10px;
     box-sizing: border-box;
     border: 2px solid #0075a3;
 }
@@ -211,7 +214,7 @@
 #street {
 
   margin-top:8px;
-  margin-bottom:8px;
+  margin-bottom:0px;
   font-weight: bold;
   font-size: 24px;
   color:#0075A3;
@@ -231,10 +234,20 @@
 .context2 {
 
   margin-top:8px;
+  margin-right:20px;
   margin-bottom:8px;
+  padding: 10px;
   font-weight: 400;
   font-size: 16px;
-  color:#0075A3;
+  color:#1F7D42;
+
+}
+
+.context2 span {
+
+  /*text-transform: uppercase;*/
+  font-weight: bold;
+
 
 }
 
@@ -308,6 +321,18 @@
     transform: translate(0px, -15px)
   }
 
+}
+
+.domain {
+  stroke:none;
+}
+
+.tick line{
+  stroke:#ccc;
+}
+
+.tick text{
+  fill:#666;
 }
 
 </style>

@@ -267,14 +267,13 @@ if(Modernizr.webgl) {
 
 
 			//Work out roadRank
-			rank = roadRank.indexOf("$" + nearestfeature.properties.properties.road);
+			rank = roadRank.indexOf("$" + nearestfeature.properties.properties.road) + 1;
 
-			percentile = rank/numberRoads;
-
-			d3.select("#street").html("How green is your street? <br><span>" +nearestfeature.properties.properties.road + "</span>")
+			//d3.select("#street").html("How green is your street? <br><span>" +nearestfeature.properties.properties.road + "</span>")
+			d3.select("#street").html("How green is " +nearestfeature.properties.properties.road + "?")
 			drawArc(average_road["$" + nearestfeature.properties.properties.road]);
 			drawIllustration(average_road["$" + nearestfeature.properties.properties.road]*100);
-			drawContext(average_road["$" + nearestfeature.properties.properties.road]*100, average_city, percentile, nearestfeature.geometry.coordinates);
+			drawContext(average_road["$" + nearestfeature.properties.properties.road]*100, nearestfeature.properties.properties.road, rank, numberRoads, nearestfeature.geometry.coordinates);
 
 		//	if
 		}
@@ -407,41 +406,32 @@ if(Modernizr.webgl) {
 
 		}
 
-		function drawContext(percentage,city, percentile,coords){
-				d3.select('.context').html("&#124; Cardiff average " + Math.round(city*100) + "%" );
+		function drawContext(percentage,road, rank, numberRoads, coords){
+				d3.select('.context').html("&#124; Cardiff average " + Math.round(average_city*100) + "%" );
 
 				city = "Cardiff";
 
-				//work out percent roads better/worse/top/bottom
-				if(percentile <0.1) {
-					 message = "Your road in the <span style='font-weight:bold'>top 10% greenest in " + city + "</span>";
-				} else if(percentile < 0.2) {
-           message = "There are around <span style='font-weight:bold'>10% roads greener than yours in " + city + "</span>";
-				} else if(percentile < 0.3) {
-           message = "There are around <span style='font-weight:bold'>20% roads greener than yours in " + city + "</span>";
-				} else if(percentile < 0.4) {
-						message = "There are around <span style='font-weight:bold'>30% roads greener than yours in " + city + "</span>";
-				} else if(percentile < 0.5) {
-						message = "Your road is about <span style='font-weight:bold'>average green in " + city + "</span>";
-				} else if(percentile < 0.6) {
-						message = "Your road is about <span style='font-weight:bold'>average green in " + city + "</span>";
-				} else if(percentile < 0.7) {
-						message = "There are around <span style='font-weight:bold'>30% roads less green than yours in " + city + "</span>";
-			  } else if(percentile < 0.8) {
-            message = "There are around <span style='font-weight:bold'>20% roads less green than yours in " + city + "</span>";
-				} else if(percentile < 0.9) {
-						message = "There are around <span style='font-weight:bold'>10% roads less green than yours in " + city + "</span>";
-				} else {
-						message = "Your road in the <span style='font-weight:bold'>bottom 10% least green in " + city + "</span>";
-				}
+
+				var no = rank
+				var lastdigit = no % 10 //#contains last digit
 
 
+				 if(lastdigit == 1) {
+					 stndrdth = "st"
+				 } else if(lastdigit == 2) {
+					 stndrdth = "nd"
+				 } else if(lastdigit == 3) {
+					 stndrdth = "rd"
+				 } else {
+					 stndrdth = "th"
+				 }
 
-				d3.select('.context2').html(message);
+
+				d3.select('.context2').style("background-color","#D8E7D0").html("<span>"+ road + "</span> is the <span>" + rank + "</span><span style='text-transform:none'>" + stndrdth + "</span> greenest street out of <span>" + numberRoads + "</span> in <span>" + city + "</span>");
 
 				d3.select(".streetview").select("a").remove();
 
-				d3.select('.streetview').append("a").attr("href","http://maps.google.com/maps?q=&layer=c&cbll=" + +coords[1] +"," + +coords[0] + "&cbp=11,0,0,0,0").text("Goto Google Streetview")//.attr("target","_blank");
+				d3.select('.streetview').append("a").attr("href","http://maps.google.com/maps?q=&layer=c&cbll=" + +coords[1] +"," + +coords[0] + "&cbp=11,0,0,0,0").text("Goto Google Streetview").attr("target","_blank");
 
 				//add google street view link
 
@@ -565,7 +555,7 @@ if(Modernizr.webgl) {
 			d3.select('#keydiv').append("svg").attr("class","score").attr("width",keydivwidth/2).attr("height",keydivwidth/2);
 			d3.select('#keydiv').append("div").attr("class","illustration").style("width",keydivwidth/2 +"px").style("height",keydivwidth/2 +"px").style("float","right");
 			d3.select('#keydiv').append("div").attr("class","context").style("width",keydivwidth +"px");
-			d3.select('#keydiv').append("div").attr("class","context2").style("width",keydivwidth +"px");
+			d3.select('#keydiv').append("div").attr("class","context2").style("width",(keydivwidth-20) +"px");
 			d3.select('#keydiv').append("div").attr("class","streetview").style("width",keydivwidth +"px");
 
 
@@ -581,7 +571,7 @@ if(Modernizr.webgl) {
 				.append("svg")
 				.attr("id", "key")
 				.attr("width", keywidth)
-				.attr("height",65);
+				.attr("height",75);
 
 			breaks = [0,20,40,60,80,100];
 
@@ -601,7 +591,7 @@ if(Modernizr.webgl) {
 			//	.tickFormat(legendformat);
 
 			var g2 = svgkey.append("g").attr("id","horiz")
-				.attr("transform", "translate(15,50)");
+				.attr("transform", "translate(15,35)");
 
 
 			keyhor = d3.select("#horiz");
@@ -639,9 +629,9 @@ if(Modernizr.webgl) {
 			g2.append("text")
 				.attr("id", "currVal")
 				.attr("x", x(10))
-				.attr("y", -15)
+				.attr("y", 30)
 				.attr("fill","#000")
-				.text("");
+				.text("% green");
 
 
 
@@ -672,12 +662,6 @@ if(Modernizr.webgl) {
 				.attr("x",x(0));
 
 
-			if(dvc.dropticks) {
-				d3.select("#horiz").selectAll("text").attr("transform",function(d,i){
-						// if there are more that 4 breaks, so > 5 ticks, then drop every other.
-						if(i % 2){return "translate(0,10)"} }
-				);
-			}
 			//Temporary	hardcode unit text
 			//dvc.unittext = "change in life expectancy";
 
