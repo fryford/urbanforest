@@ -1,7 +1,7 @@
 
 //test if browser supports webGL
 
-if(Modernizr.webgl) {
+if(Modernizr.webgl == false) {
 
 	//setup pymjs
 	var pymChild = new pym.Child();
@@ -20,16 +20,14 @@ if(Modernizr.webgl) {
 		dvc = config.ons;
 		oldAREACD = "";
 		var draw = true;
+		city = "Cardiff";
+
 
 
 		//set title of page
 		//Need to test that this shows up in GA
 		document.title = dvc.maptitle;
 
-		//Fire design functions
-		//selectlist(data);
-		createInfo(dvc);
-		createKey();
 
 		//Set up number formats
 		displayformat = d3.format("." + dvc.displaydecimals + "f");
@@ -91,21 +89,24 @@ if(Modernizr.webgl) {
 		"name": "points",
 		"features": []};
 
+		radius = 0.005;
+
 		data.forEach(function(d,i) {
 
-				var center = [d.lon, d.lat];
-				var radius = 0.005;
+				var center = [+d.lon, +d.lat];
 				var options = {steps: 6, units: 'kilometers', properties: {average_green: d.average_green*100, fill: color(d.average_green), road:d.road}};
 				var circle = turf.circle(center, radius, options);
 				var point = turf.point(center,options);
 
 				circles.features.push(circle);
         points.features.push(point);
-				//var addToMap = [turf.point(center), circle]
-				// console.log(addToMap)
-
 
 		});
+
+		console.log(circles);
+
+		//work out convex hull for bounding area1
+		hull = turf.convex(points);
 
 
 		//work out the average green for each uniquely named road in the city.
@@ -121,10 +122,37 @@ if(Modernizr.webgl) {
 
 		numberRoads = roadRank.length;
 
+		//Fire design functions
+		//selectlist(data);
+		createInfo(dvc);
+		createKey();
+
+
 		map.on('load', function() {
 
 			map.addSource('area', { 'type': 'geojson', 'data': circles });
 
+			console.log("I'm here")
+
+			// map.addLayer({
+			// 				'id': 'maine',
+			// 				'type': 'fill',
+			// 				'source': {
+			// 						'type': 'geojson',
+			// 						'data': {
+			// 								'type': 'Feature',
+			// 								'geometry': {
+			// 										'type': 'Polygon',
+			// 										'coordinates': [hull.geometry.coordinates[0]]
+			// 								}
+			// 						}
+			// 				},
+			// 				'layout': {},
+			// 				'paint': {
+			// 						'fill-color': '#088',
+			// 						'fill-opacity': 0.8
+			// 				}
+			// 		});
 
 			zoomThreshold = 11;
 
@@ -139,11 +167,12 @@ if(Modernizr.webgl) {
 						'property': 'fill',
 						'type': 'identity'
 					},
-						'fill-extrusion-height': {
-							// Get fill-extrusion-height from the source 'height' property.
-							'property': 'average_green',
-							'type': 'identity'
-						},
+					'fill-extrusion-height': {
+						// Get fill-extrusion-height from the source 'height' property.
+						'property': 'average_green',
+						'type': 'identity'
+					},
+					//'fill-extrusion-height': 0,
 					  //'fill-extrusion-color': '#000',
 					  //'fill-extrusion-height': 100,
 						'fill-extrusion-base': 0,
@@ -151,6 +180,7 @@ if(Modernizr.webgl) {
 				}
 			}, 'place_suburb');
 
+      console.log("I'm here")
 
 			map.addLayer({
 				'id': 'areahover',
@@ -168,11 +198,13 @@ if(Modernizr.webgl) {
 							'property': 'average_green',
 							'type': 'identity'
 						},
+						//'fill-extrusion-height': 0,
 						'fill-extrusion-base': 0,
 						'fill-extrusion-opacity': 1
 				}, "filter": ["==", "road", ""]
 			}, 'place_suburb');
 
+			console.log("I'm here")
 
 					//Highlight stroke on mouseover (and show area information)
 
@@ -213,8 +245,7 @@ if(Modernizr.webgl) {
 						dataType: "jsonp",
 						url: myURIstring,
 						error: function (xhr, ajaxOptions, thrownError) {
-							console.log(thrownError);
-								//$("#pcError").text("couldn't process this request").show();
+								$("#errorMessage").text("Sorry that's not a postcode that we recognise. Try again");
 
 							},
 						success: function(data1){
@@ -222,12 +253,9 @@ if(Modernizr.webgl) {
 								//$("#pcError").hide();
 								lat =data1.result.latitude;
 								lng = data1.result.longitude;
-
-								success(lat,lng)
-								//$("#successMessage").text("The postcode " + myPC + " is situated in " + areaName + " which has an area code of " + area).show();
+								success(lat,lng);
 							} else {
-			          //$("#successMessage").hide();
-								//$("#pcError").text("Not a valid postcode I'm afraid").show();
+								$("#errorMessage").text("Sorry thats not a postcode that we recognise. Try again");
 							}
 						}
 
@@ -247,7 +275,17 @@ if(Modernizr.webgl) {
 				flying=false;
 			});
 
-			setFilterRoad(lat,lng)
+
+			var targetPoints = turf.point([lng, lat]);
+			var ptsWithin = turf.inside(targetPoints, hull);
+			console.log(ptsWithin)
+			if(ptsWithin == true) {
+					$("#errorMessage").text("");
+					setFilterRoad(lat,lng)
+			} else {
+				  $("#errorMessage").html('Sorry thats not a postcode covered by this research. Here is <a href="http://geoportal.statistics.gov.uk/datasets/major-towns-and-cities-december-2015-boundaries?geometry=-3.587%2C51.424%2C-2.544%2C51.573" target="_blank">the area</a> covered.');
+			}
+
 
 		};
 
@@ -270,12 +308,12 @@ if(Modernizr.webgl) {
 			rank = roadRank.indexOf("$" + nearestfeature.properties.properties.road) + 1;
 
 			//d3.select("#street").html("How green is your street? <br><span>" +nearestfeature.properties.properties.road + "</span>")
-			d3.select("#street").html("How green is " +nearestfeature.properties.properties.road + "?")
+			//d3.select("#street").html("How green is " +nearestfeature.properties.properties.road + "?")
 			drawArc(average_road["$" + nearestfeature.properties.properties.road]);
 			drawIllustration(average_road["$" + nearestfeature.properties.properties.road]*100);
 			drawContext(average_road["$" + nearestfeature.properties.properties.road]*100, nearestfeature.properties.properties.road, rank, numberRoads, nearestfeature.geometry.coordinates);
 
-		//	if
+
 		}
 
 		function drawArc(percentage) {
@@ -325,8 +363,11 @@ if(Modernizr.webgl) {
 
 			// Add the average arc
 			var foregroundaverage = g.append("path")
+					.attr("class","average_arc")
 					.style("fill", "#00722F")
-					.attr("d", averagearc);
+					.attr("opacity",0)
+					.attr("d", averagearc)
+
 
 
 			// add centre text
@@ -351,7 +392,10 @@ if(Modernizr.webgl) {
 			format = d3.format(",.0%");
 
 
-			}
+		} else {
+			d3.select(".average_arc").style("opacity",1)
+			d3.select(".context").style("opacity",1)
+		}
 
 			foreground.transition()
 		      .duration(750)
@@ -363,6 +407,8 @@ if(Modernizr.webgl) {
 			update(percentage)
 
 		  function update(newValue){
+
+
 					  g.select("text")
 					    .transition()
 					      .duration(750)
@@ -407,10 +453,6 @@ if(Modernizr.webgl) {
 		}
 
 		function drawContext(percentage,road, rank, numberRoads, coords){
-				d3.select('.context').html("&#124; Cardiff average " + Math.round(average_city*100) + "%" );
-
-				city = "Cardiff";
-
 
 				var no = rank
 				var lastdigit = no % 10 //#contains last digit
@@ -427,7 +469,7 @@ if(Modernizr.webgl) {
 				 }
 
 
-				d3.select('.context2').style("background-color","#D8E7D0").html("<span>"+ road + "</span> is the <span>" + rank + "</span><span style='text-transform:none'>" + stndrdth + "</span> greenest street out of <span>" + numberRoads + "</span> in <span>" + city + "</span>");
+				d3.select('.context2').html("<span>"+ road + "</span> is the <span>" + rank + "</span><span style='text-transform:none'>" + stndrdth + "</span> greenest street out of <span>" + numberRoads + "</span> in <span>" + city + "</span>");
 
 				d3.select(".streetview").select("a").remove();
 
@@ -547,18 +589,20 @@ if(Modernizr.webgl) {
 			//d3.select("#keydiv")
 			//console.log(keydata);
 
-			d3.select('#keydiv').append("p").attr("id","street").text("");
+			d3.select('#keydiv').append("p").attr("id","errorMessage").text("");
+			//d3.select('#keydiv').append("p").attr("id","street").text("")
 
 			keydivwidth = parseInt(d3.select("#keydiv").style("width"));
 
-
+			d3.select('#keydiv').append("div").attr("class","context").style("width",keydivwidth +"px").html("&#8212; <span style='font-weight:400'>"+ city +" average </span>" + Math.round(average_city*100) + "%" ).style("opacity",0);
 			d3.select('#keydiv').append("svg").attr("class","score").attr("width",keydivwidth/2).attr("height",keydivwidth/2);
 			d3.select('#keydiv').append("div").attr("class","illustration").style("width",keydivwidth/2 +"px").style("height",keydivwidth/2 +"px").style("float","right");
-			d3.select('#keydiv').append("div").attr("class","context").style("width",keydivwidth +"px");
-			d3.select('#keydiv').append("div").attr("class","context2").style("width",(keydivwidth-20) +"px");
+;
+			d3.select('#keydiv').append("div").attr("class","context2").style("width",(keydivwidth-20) +"px").html("<span>Your road</span> is the <span>xx</span><span style='text-transform:none'>th</span> greenest street out of <span>xxx</span> in <span>" + city + "</span>");
 			d3.select('#keydiv').append("div").attr("class","streetview").style("width",keydivwidth +"px");
 
-
+			drawArc(0);
+			drawIllustration(0);
 
 
 		}
@@ -628,8 +672,8 @@ if(Modernizr.webgl) {
 
 			g2.append("text")
 				.attr("id", "currVal")
-				.attr("x", x(10))
-				.attr("y", 30)
+				.attr("x", 19)
+				.attr("y", 32)
 				.attr("fill","#000")
 				.text("% green");
 
