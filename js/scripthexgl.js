@@ -1,7 +1,7 @@
 
 //test if browser supports webGL
 
-if(Modernizr.webgl == false) {
+if(Modernizr.webgl) {
 
 	//setup pymjs
 	var pymChild = new pym.Child();
