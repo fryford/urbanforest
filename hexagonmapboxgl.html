@@ -271,6 +271,20 @@
 
 }
 
+.share {
+
+  margin-top:8px;
+  margin-right:20px;
+  margin-bottom:8px;
+  padding: 10px;
+  font-weight: bold;
+  text-align:center;
+  font-size: 16px;
+  color:#246193;
+  background-color:#DEE7EF;
+
+}
+
 #legenddiv {
     position: absolute;
     bottom: 0px;
@@ -279,6 +293,49 @@
     height: 80px;
     z-index: 2;
     background-color: rgba(255,255,255,0.7);
+}
+
+#howtouse {
+
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  color: #246193;
+  padding: 5px 10px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 12px;
+
+}
+
+#howtouseinfo {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    width: calc(100% - 75px);
+    z-index: 3;
+    background-color: #246193;
+    color: #fff;
+    padding: 15px 15px;
+    display: none;
+
+}
+
+
+#OK {
+  background-color: #fff;
+  border: none;
+  color: #246193;
+  padding: 10px 16px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 14px;
+  margin-top: 10px;
 }
 
 .percentgreen {
@@ -368,6 +425,23 @@
 </div>
 
 <div id='map'>
+
+  <button id="howtouse" type="submit">How to use this map</button>
+  <div id="howtouseinfo">
+
+
+<h2>How to use the map</h2>
+<p>This map shows you how much vegetation can be seen from a pedestrian's view of the street, in 10 metre sections, across the city. For instance, if the area is 70% green, it means that 70% of pedestrians' views in that spot are taken up by vegetation such as trees, hedges, grass, etc.</p>
+
+<p style='font-weight:bold; padding-top:10px'>Map control on desktop</p>
+<p>Using the mouse wheel will zoom in and out.</p>
+<p>Holding CTRL and left-click will allow you to tilt and pan around the map.</p>
+<p>Holding SHIFT and left-clicking will allow you to draw a box on the map and zoom into the selected area.</p>
+
+<p style='font-weight:bold; padding-top:10px'>Map control on mobile</p>
+<p>Use one finger to move around on the map, and two to pan around.</p>
+<button id="OK" type="submit">I'm done</button>
+  </div>
   <div id="legenddiv"></div>
 </div>
 

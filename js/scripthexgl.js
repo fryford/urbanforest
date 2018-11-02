@@ -22,11 +22,21 @@ if(Modernizr.webgl) {
 		var draw = true;
 		city = "Cardiff";
 
+		commaFormat = d3.format(',')
+
+
 
 
 		//set title of page
 		//Need to test that this shows up in GA
 		document.title = dvc.maptitle;
+
+		//show information
+		d3.select("#howtouse")
+			.on("click", function(){d3.select("#howtouseinfo").style("display","block")});
+
+		d3.select("#OK")
+			.on("click", function(){d3.select("#howtouseinfo").style("display","none")});
 
 
 		//Set up number formats
@@ -120,7 +130,7 @@ if(Modernizr.webgl) {
 
 		roadRank = Object.keys(average_road).sort(function(a,b){return average_road[b]-average_road[a]})
 
-		numberRoads = roadRank.length;
+		numberRoads = commaFormat(roadRank.length);
 
 		//Fire design functions
 		//selectlist(data);
@@ -250,7 +260,7 @@ if(Modernizr.webgl) {
 						dataType: "jsonp",
 						url: myURIstring,
 						error: function (xhr, ajaxOptions, thrownError) {
-								$("#errorMessage").text("Sorry that's not a postcode that we recognise. Try again");
+								$("#errorMessage").text("Sorry, that's not a postcode we recognise. Please try again.");
 
 							},
 						success: function(data1){
@@ -269,7 +279,7 @@ if(Modernizr.webgl) {
 								}
 
 							} else {
-								$("#errorMessage").text("Sorry thats not a postcode that we recognise. Try again");
+								$("#errorMessage").text("Sorry, that's not a postcode we recognise. Please try again.");
 							}
 						}
 
@@ -297,7 +307,7 @@ if(Modernizr.webgl) {
 					$("#errorMessage").text("");
 					setFilterRoad(lat,lng)
 			} else {
-				  $("#errorMessage").html('Sorry thats not a postcode covered by this research. Here is <a href="http://geoportal.statistics.gov.uk/datasets/major-towns-and-cities-december-2015-boundaries?geometry=-3.587%2C51.424%2C-2.544%2C51.573" target="_blank">the area</a> covered.');
+				  $("#errorMessage").html('Sorry, that postcode is not covered by this research. It covers <a href="http://geoportal.statistics.gov.uk/datasets/major-towns-and-cities-december-2015-boundaries?geometry=-3.587%2C51.424%2C-2.544%2C51.573" target="_blank">major towns and city boundaries</a>.');
 			}
 
 
@@ -476,26 +486,42 @@ if(Modernizr.webgl) {
 
 		function drawContext(percentage,road, rank, numberRoads, coords){
 
-				var no = rank
-				var lastdigit = no % 10 //#contains last digit
+				var no = rank;
+
+				 // if(lastdigit == "1") {
+					//  stndrdth = "st"
+				 // } else if(lastdigit == "2") {
+					//  stndrdth = "nd"
+				 // } else if(lastdigit == "3") {
+					//  stndrdth = "rd"
+				 // } else if(lastdigit == "21") {
+					//  stndrdth = "th"
+				 // } else if(lastdigit == "") {
+					//  stndrdth = "th"
+				 // } else {
+					//  stndrdth = "th"
+				 // }
 
 
-				 if(lastdigit == 1) {
-					 stndrdth = "st"
-				 } else if(lastdigit == 2) {
-					 stndrdth = "nd"
-				 } else if(lastdigit == 3) {
-					 stndrdth = "rd"
-				 } else {
-					 stndrdth = "th"
+			   var j = no % 10,
+			       k = no % 100;
+			   if (j == 1 && k != 11) {
+			       stndrdth = "st";
+			   } else if (j == 2 && k != 12) {
+			       stndrdth = "nd";
+			   } else if (j == 3 && k != 13) {
+			       stndrdth = "rd";
+			   } else {
+					 	 stndrdth = "th";
 				 }
 
 
-				d3.select('.context2').html("<span>"+ road + "</span> is the <span>" + rank + "</span><span style='text-transform:none'>" + stndrdth + "</span> greenest street out of <span>" + numberRoads + "</span> in <span>" + city + "</span>");
 
-				d3.select(".streetview").select("a").remove();
+				d3.select('.context2').html("<span>"+ road + "</span> is the <span>" + commaFormat(rank) + "</span><span style='text-transform:none'>" + stndrdth + "</span> greenest street out of <span>" + numberRoads + "</span> in <span>" + city + "</span>");
 
-				d3.select('.streetview').append("a").attr("href","http://maps.google.com/maps?q=&layer=c&cbll=" + +coords[1] +"," + +coords[0] + "&cbp=11,0,0,0,0").text("Goto Google Streetview").attr("target","_blank");
+				//d3.select(".streetview").select("a").remove();
+
+				//d3.select('.streetview').append("a").attr("href","http://maps.google.com/maps?q=&layer=c&cbll=" + +coords[1] +"," + +coords[0] + "&cbp=11,0,0,0,0").text("Goto Google Streetview").attr("target","_blank");
 
 				//add google street view link
 
@@ -564,7 +590,15 @@ if(Modernizr.webgl) {
 			d3.select('#keydiv').append("div").attr("class","illustration").style("width",keydivwidth/2 +"px").style("height",keydivwidth/2 +"px").style("float","right");
 ;
 			d3.select('#keydiv').append("div").attr("class","context2").style("width",(keydivwidth-20) +"px").html("<span>Your road</span> is the <span>xx</span><span style='text-transform:none'>th</span> greenest street out of <span>xxx</span> in <span>" + city + "</span>");
-			d3.select('#keydiv').append("div").attr("class","streetview").style("width",keydivwidth +"px");
+			//d3.select('#keydiv').append("div").attr("class","streetview").style("width",keydivwidth +"px");
+
+			d3.select('#keydiv').append("div").attr("class","share").style("width",(keydivwidth-20) +"px").html("<span>Share</span>");
+
+			sharebuttons = 	d3.select('.share').append("div").style("padding-top","5px")
+
+			sharebuttons.append("img").attr("src","images/facebook.svg").style("height","30px").style("width","30px")
+			sharebuttons.append("img").attr("src","images/twitter.svg").style("height","30px").style("width","30px").style("padding-left","5px").style("padding-right","5px")
+			sharebuttons.append("img").attr("src","images/link.svg").style("height","30px").style("width","30px")
 
 			drawArc(0);
 			drawIllustration(0);
