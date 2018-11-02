@@ -596,14 +596,67 @@ if(Modernizr.webgl) {
 
 			sharebuttons = 	d3.select('.share').append("div").style("padding-top","5px")
 
-			sharebuttons.append("img").attr("src","images/facebook.svg").style("height","30px").style("width","30px")
-			sharebuttons.append("img").attr("src","images/twitter.svg").style("height","30px").style("width","30px").style("padding-left","5px").style("padding-right","5px")
-			sharebuttons.append("img").attr("src","images/link.svg").style("height","30px").style("width","30px")
+			clickedlink = false;
+
+			ParentURL = (window.location != window.parent.location)
+										? document.referrer
+										: document.location;
+
+			sharebuttons.append("a")
+				.attr("id","facebookShare")
+				.attr("href","https://www.facebook.com/sharer/sharer.php?u=" + ParentURL)
+				.attr("target","_blank")
+				.attr("title","Facebook")
+			  .append("img")
+				.attr("class","socialicon")
+				.attr("src","images/facebook.svg")
+				.style("height","30px")
+				.style("width","30px");
+
+			sharebuttons.append("a")
+					.attr("id","twitterShare")
+					.attr("href","https://twitter.com/intent/tweet?text=Explore how green is your street - explore our interactive map " + ParentURL)
+					.attr("target","_blank")
+					.style("height","30px")
+					.style("width","30px")
+					.attr("title","Twitter")
+					.append("img")
+					.attr("class","socialicon")
+					.attr("src","images/twitter.svg")
+					.style("height","30px")
+					.style("width","30px")
+					.style("padding-left","5px")
+					.style("padding-right","5px");
+
+			sharebuttons.append("img")
+					.attr("class","socialicon")
+					.attr("src","images/link.svg")
+					.style("height","30px")
+					.style("width","30px")
+					.on("click", copiedtoclipboard);
+
+			sharebuttons.append("p").attr("class","copytextlabel").text("Copy this link").style("text-align","left").style("font-weight","400").style("font-size","14px").style("margin","5px").style("display","none");
+			sharebuttons.append("input").attr("class","copytext").attr("value",ParentURL).style("height","30px").style("width","100%").style("display","none");
+
+
 
 			drawArc(0);
 			drawIllustration(0);
 
 
+		}
+
+		function copiedtoclipboard () {
+
+			if(clickedlink ==false) {
+				clickedlink =true;
+				d3.select(".copytextlabel").style("display","block");
+				d3.select(".copytext").style("display","block");
+			}	else {
+				clickedlink =false;
+				d3.select(".copytextlabel").style("display","none");
+				d3.select(".copytext").style("display","none");
+			}
 		}
 
 		function createKey(){
