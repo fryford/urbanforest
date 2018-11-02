@@ -8,9 +8,8 @@ if(Modernizr.webgl) {
 
 	//Load data and config file
 	d3.queue()
-		.defer(d3.csv, "cardiff_tree_points_min.csv")
+		.defer(d3.csv, "Cardiff_tree_points_min.csv")
 		.defer(d3.json, "data/config.json")
-		//.defer(d3.json, "data/geog.json")
 		.await(ready);
 
 
@@ -180,7 +179,8 @@ if(Modernizr.webgl) {
 				}
 			}, 'place_suburb');
 
-      console.log("I'm here")
+
+			console.log("I'm here")
 
 			map.addLayer({
 				'id': 'areahover',
@@ -204,6 +204,8 @@ if(Modernizr.webgl) {
 				}, "filter": ["==", "road", ""]
 			}, 'place_suburb');
 
+
+
 			console.log("I'm here")
 
 					//Highlight stroke on mouseover (and show area information)
@@ -214,11 +216,6 @@ if(Modernizr.webgl) {
 						//console.log(e.features[0].properties.road);
 						setFilterRoad(e.lngLat.lat,e.lngLat.lng)
 						d3.select("#keydiv").attr("height","auto");
-						//console.log(e);
-						// map.setFilter("areahover", ["==", "road", e.features[0].properties.road]);
-						// d3.select("#street").html(e.features[0].properties.road + "<br>" + Math.round(e.features[0].properties.average_green) + "% vegetation");
-
-						//showAreaInfo(e.features[0].properties.AREANM, rateById[e.features[0].properties.AREACD]);
 
 					});
 
@@ -231,6 +228,13 @@ if(Modernizr.webgl) {
 						myValue=$("#pcText").val();
 						d3.select("#keydiv").style("height","auto");
 						getCodes(myValue);
+
+						//Work out whether it's a Newport or Cardiff postcode
+
+
+
+
+
 		});
 
 
@@ -253,7 +257,16 @@ if(Modernizr.webgl) {
 								//$("#pcError").hide();
 								lat =data1.result.latitude;
 								lng = data1.result.longitude;
-								success(lat,lng);
+								newcity = data1.result.admin_district;
+
+							  if(newcity != city) {
+									city = newcity;
+									loadnewdata(newcity,lat,lng);
+									//success(lat,lng);
+								} else {
+									success(lat,lng);
+								}
+
 							} else {
 								$("#errorMessage").text("Sorry thats not a postcode that we recognise. Try again");
 							}
@@ -309,7 +322,7 @@ if(Modernizr.webgl) {
 
 			//d3.select("#street").html("How green is your street? <br><span>" +nearestfeature.properties.properties.road + "</span>")
 			//d3.select("#street").html("How green is " +nearestfeature.properties.properties.road + "?")
-			drawArc(average_road["$" + nearestfeature.properties.properties.road]);
+			drawArc(average_road["$" + nearestfeature.properties.properties.road], average_city);
 			drawIllustration(average_road["$" + nearestfeature.properties.properties.road]*100);
 			drawContext(average_road["$" + nearestfeature.properties.properties.road]*100, nearestfeature.properties.properties.road, rank, numberRoads, nearestfeature.geometry.coordinates);
 
@@ -362,7 +375,7 @@ if(Modernizr.webgl) {
 			    .attr("d", arc);
 
 			// Add the average arc
-			var foregroundaverage = g.append("path")
+			foregroundaverage = g.append("path")
 					.attr("class","average_arc")
 					.style("fill", "#00722F")
 					.attr("opacity",0)
@@ -402,11 +415,19 @@ if(Modernizr.webgl) {
 		      .attrTween("d", arcTween(percentage * tau));
 
 
+			update(percentage,average_city)
 
+		  function update(newValue,city_average){
+				console.log(city_average)
 
-			update(percentage)
+				averagearc = d3.arc()
+				    .innerRadius((keydivwidth/4)-25)
+				    .outerRadius((keydivwidth/4)-6)
+				    .startAngle(city_average * tau)
+						.endAngle((city_average * tau) +0.05);
 
-		  function update(newValue){
+				d3.select(".average_arc")
+					.attr("d", averagearc);
 
 
 					  g.select("text")
@@ -507,20 +528,7 @@ if(Modernizr.webgl) {
 
 					d3.select("#people").text(e.features[0].properties["road"])
 
-
-
-
-//					selectArea(e.features[0].properties.oa11cd);
-//					setAxisVal(e.features[0].properties.oa11cd);
 				}
-		};
-
-
-		function onLeave() {
-				map.setFilter("state-fills-hover", ["==", "AREACD", ""]);
-				oldAREACD = "";
-				$("#areaselect").val("").trigger("chosen:updated");
-				hideaxisVal();
 		};
 
 
@@ -539,50 +547,6 @@ if(Modernizr.webgl) {
 			$("#areaselect").val(code).trigger("chosen:updated");
 		}
 
-		function zoomToArea(code) {
-
-			specificpolygon = areas.features.filter(function(d) {return d.properties.AREACD == code})
-
-			specific = turf.extent(specificpolygon[0].geometry);
-
-			map.fitBounds([[specific[0],specific[1]], [specific[2], specific[3]]], {
-  				padding: {top: 150, bottom:150, left: 100, right: 100}
-			});
-
-		}
-
-		function resetZoom() {
-
-			map.fitBounds([[bounds[0], bounds[1]], [bounds[2], bounds[3]]]);
-
-		}
-
-
-		function setAxisVal(code) {
-			d3.select("#currLine")
-				.style("opacity", function(){if(!isNaN(rateById[code])) {return 1} else{return 0}})
-				.transition()
-				.duration(400)
-				.attr("x1", function(){if(!isNaN(rateById[code])) {return x(rateById[code])} else{return x(midpoint)}})
-				.attr("x2", function(){if(!isNaN(rateById[code])) {return x(rateById[code])} else{return x(midpoint)}});
-
-
-			d3.select("#currVal")
-				.text(function(){if(!isNaN(rateById[code]))  {return displayformat(rateById[code])} else {return "Data unavailable"}})
-				.style("opacity",1)
-				.transition()
-				.duration(400)
-				.attr("x", function(){if(!isNaN(rateById[code])) {return x(rateById[code])} else{return x(midpoint)}});
-
-		}
-
-		function hideaxisVal() {
-			d3.select("#currLine")
-				.style("opacity",0)
-
-			d3.select("#currVal").text("")
-				.style("opacity",0)
-		}
 
 		function createInfo(keydata) {
 
@@ -712,6 +676,120 @@ if(Modernizr.webgl) {
 			//d3.select("#keydiv").append("p").attr("id","keyunit").style("margin-top","-10px").style("margin-left","10px").text(dvc.varunit);
 
 	} // Ends create key
+
+
+	function loadnewdata(city, lat,lng) {
+
+		map.removeLayer('area')
+		map.removeLayer('areahover')
+		map.removeSource('area')
+
+		d3.queue()
+			.defer(d3.csv, city + "_tree_points_min.csv")
+			.await(loaddata);
+
+	}
+
+	function loaddata(error, data){
+
+		//Loop to generate circle/hexagon for each point in the data
+
+		circles = {"type": "FeatureCollection",
+		"name": "circlepolygons",
+		"features": []};
+
+		points = {"type": "FeatureCollection",
+		"name": "points",
+		"features": []};
+
+		radius = 0.005;
+
+		data.forEach(function(d,i) {
+
+				var center = [+d.lon, +d.lat];
+				var options = {steps: 6, units: 'kilometers', properties: {average_green: d.average_green*100, fill: color(d.average_green), road:d.road}};
+				var circle = turf.circle(center, radius, options);
+				var point = turf.point(center,options);
+
+				circles.features.push(circle);
+				points.features.push(point);
+
+		});
+
+		console.log(circles);
+
+		//work out convex hull for bounding area1
+		hull = turf.convex(points);
+
+
+		//work out the average green for each uniquely named road in the city.
+		average_road = d3.nest()
+										.key(function(d) { return d.road; })
+										.rollup(function(values) { return d3.mean(values, function(d) {return +d.average_green; }) })
+										.map(data);
+
+		//work out the average green for the whole dataset
+		average_city = d3.median(data, function(d) { return +d.average_green; });
+
+		roadRank = Object.keys(average_road).sort(function(a,b){return average_road[b]-average_road[a]})
+
+		numberRoads = roadRank.length;
+
+
+		map.addSource('area', { 'type': 'geojson', 'data': circles });
+
+		map.addLayer({
+			'id': 'area',
+			'type': 'fill-extrusion',
+			'source': 'area',
+			'layout': {},
+			'paint': {
+					'fill-extrusion-color': {
+						// Get the fill-extrusion-color from the source 'color' property.
+					'property': 'fill',
+					'type': 'identity'
+				},
+				'fill-extrusion-height': {
+					// Get fill-extrusion-height from the source 'height' property.
+					'property': 'average_green',
+					'type': 'identity'
+				},
+				//'fill-extrusion-height': 0,
+					//'fill-extrusion-color': '#000',
+					//'fill-extrusion-height': 100,
+					'fill-extrusion-base': 0,
+					'fill-extrusion-opacity': 0.6
+			}
+		}, 'place_suburb');
+
+		map.addLayer({
+			'id': 'areahover',
+			'type': 'fill-extrusion',
+			'source': 'area',
+			'layout': {},
+			'paint': {
+						'fill-extrusion-color': {
+							// Get the fill-extrusion-color from the source 'color' property.
+						'property': 'fill',
+						'type': 'identity'
+					},
+					'fill-extrusion-height': {
+						// Get fill-extrusion-height from the source 'height' property.
+						'property': 'average_green',
+						'type': 'identity'
+					},
+					//'fill-extrusion-height': 0,
+					'fill-extrusion-base': 0,
+					'fill-extrusion-opacity': 1
+			}, "filter": ["==", "road", ""]
+		}, 'place_suburb');
+
+			success(lat,lng);
+
+			d3.select(".context").html("&#8212; <span style='font-weight:400'>"+ city +" average </span>" + Math.round(average_city*100) + "%" ).style("opacity",0);
+
+
+	}
 
 	function addFullscreen() {
 
