@@ -787,7 +787,7 @@ if(Modernizr.webgl) {
 
 			success(lat,lng);
 
-			d3.select(".context").html("&#8212; <span style='font-weight:400'>"+ city +" average </span>" + Math.round(average_city*100) + "%" ).style("opacity",0);
+			d3.select(".context").html("&#8212; <span style='font-weight:400'>"+ city +" average </span>" + Math.round(average_city*100) + "%" );
 
 
 	}
