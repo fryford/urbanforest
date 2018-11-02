@@ -8,12 +8,13 @@ if(Modernizr.webgl) {
 
 	//Load data and config file
 	d3.queue()
-		.defer(d3.csv, "Cardiff_tree_points_min.csv")
+		.defer(d3.csv, "cardiff_tree_points_min.csv")
 		.defer(d3.json, "data/config.json")
 		.await(ready);
 
 
 	function ready (error, data, config){
+
 
 		//Set up global variables
 		dvc = config.ons;
@@ -685,7 +686,7 @@ if(Modernizr.webgl) {
 		map.removeSource('area')
 
 		d3.queue()
-			.defer(d3.csv, city + "_tree_points_min.csv")
+			.defer(d3.csv, city.toLowerCase() + "_tree_points_min.csv")
 			.await(loaddata);
 
 	}
