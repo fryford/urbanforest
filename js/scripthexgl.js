@@ -8,7 +8,22 @@ if(Modernizr.webgl) {
 
 	//Load data and config file
 	d3.queue()
-		.defer(d3.csv, "cardiff_data.csv")
+		//.defer(d3.csv, "cardiff_data.csv")
+		.defer(function(f) {d3.csv("cardiff_data.csv",function(data){
+		        //do stuff with data
+		    }).on("progress", function(event){
+					 console.log(event)
+		        //update progress bar
+		        if (event.lengthComputable) {
+		          var percentComplete = Math.round(event.loaded * 100 / event.total);
+		          console.log(percentComplete);
+		       }
+		    }
+		)
+		.get(function(error, data) {
+	    f(error, data);
+	  })
+		})
 		.defer(d3.json, "data/config.json")
 		.await(ready);
 
@@ -48,9 +63,11 @@ if(Modernizr.webgl) {
 		  container: 'map', // container id
 		 // style: style,
 		 //Qi2gszp5uSG09U66VCvH
-		  style: 'https://maps.tilehosting.com/styles/positron/style.json?key=7rA0yA362pBi9PZxyYlY', //stylesheet location
+
+		  style: 'data/stylenew.json',
+		 // style: 'https://maps.tilehosting.com/styles/positron/style.json?key=7rA0yA362pBi9PZxyYlY', //stylesheet location
 		  center: [-3.1750, 51.488224], // starting position
-		  zoom: 13, // starting zoom
+		  zoom: 14, // starting zoom
 		  maxZoom: 20,
 			minZoom: 13, //
 			pitch: 60,
@@ -269,10 +286,14 @@ if(Modernizr.webgl) {
 								lat =data1.result.latitude;
 								lng = data1.result.longitude;
 								newcity = data1.result.admin_district;
-
+								console.log(newcity)
 							  if(newcity != city) {
 									city = newcity;
-									loadnewdata(newcity,lat,lng);
+									if(city == "Newport" || city == "Cardiff") {
+										loadnewdata(newcity,lat,lng);
+									} else {
+										success(lat,lng);
+									}
 									//success(lat,lng);
 								} else {
 									success(lat,lng);
@@ -307,7 +328,7 @@ if(Modernizr.webgl) {
 					$("#errorMessage").text("");
 					setFilterRoad(lat,lng)
 			} else {
-				  $("#errorMessage").html('Sorry, that postcode is not covered by this research. It covers <a href="http://geoportal.statistics.gov.uk/datasets/major-towns-and-cities-december-2015-boundaries?geometry=-3.587%2C51.424%2C-2.544%2C51.573" target="_blank">major towns and city boundaries</a>.');
+				  $("#errorMessage").html('Sorry, that postcode is not covered by this research. It currently covers <a href="http://geoportal.statistics.gov.uk/datasets/major-towns-and-cities-december-2015-boundaries?geometry=-3.587%2C51.424%2C-2.544%2C51.573" target="_blank">major towns and city boundaries</a> for Cardiff & Newport.');
 			}
 
 
