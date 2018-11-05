@@ -636,7 +636,7 @@ if(Modernizr.webgl) {
 
 			sharebuttons.append("a")
 					.attr("id","twitterShare")
-					.attr("href","https://twitter.com/intent/tweet?text=Explore how green is your street - explore our interactive map " + ParentURL)
+					.attr("href","https://twitter.com/intent/tweet?text=Explore Do you know how green your street is? Explore this interactive map: " + ParentURL)
 					.attr("target","_blank")
 					.style("height","30px")
 					.style("width","30px")
