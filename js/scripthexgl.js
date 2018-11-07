@@ -130,7 +130,12 @@ if(Modernizr.webgl) {
 
 		});
 
-		console.log(circles);
+		//work out bounding box
+		var bbox = turf.bbox(points);
+		var bboxPolygon = turf.bboxPolygon(bbox);
+
+		console.log(bbox)
+		console.log(bboxPolygon);
 
 		//work out convex hull for bounding area1
 		hull = turf.convex(points);
@@ -611,10 +616,10 @@ if(Modernizr.webgl) {
 
 		if(bodywidth < 790 && bodywidth > 590) {
 			console.log(keydivwidth*2)
-			d3.select('#keydiv').append("div").attr("class","context2").style("width",(keydivwidth*(70/50))-20 +"px").html("<span>Your road</span> is the <span>xx</span><span style='text-transform:none'>th</span> greenest street out of <span>xxx</span> in <span>" + city + "</span>");
+			d3.select('#keydiv').append("div").attr("class","context2").style("width",(keydivwidth*(70/50))-20 +"px").html("<span>Your road</span> is the <span>__</span><span style='text-transform:none'></span> greenest street out of <span>___</span> in <span>________</span>");
 			d3.select('#keydiv').append("div").attr("class","share").style("width",(keydivwidth*(30/50))-30 +"px").html("<span>Share</span>");
 		} else {
-			d3.select('#keydiv').append("div").attr("class","context2").style("width",(keydivwidth-20) +"px").html("<span>Your road</span> is the <span>xx</span><span style='text-transform:none'>th</span> greenest street out of <span>xxx</span> in <span>" + city + "</span>");
+			d3.select('#keydiv').append("div").attr("class","context2").style("width",(keydivwidth-20) +"px").html("<span>Your road</span> is the <span>__</span><span style='text-transform:none'></span> greenest street out of <span>___</span> in <span>________</span>");
 			d3.select('#keydiv').append("div").attr("class","share").style("width",(keydivwidth-20) +"px").html("<span>Share</span>");
 		}
 
@@ -829,8 +834,12 @@ if(Modernizr.webgl) {
 				points.features.push(point);
 
 		});
+		//work out bounding box
+		var bbox = turf.bbox(points);
+		var bboxPolygon = turf.bboxPolygon(bbox);
 
-		console.log(circles);
+		console.log(bbox)
+		console.log(bboxPolygon);
 
 		//work out convex hull for bounding area1
 		hull = turf.convex(points);
