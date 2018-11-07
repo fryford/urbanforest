@@ -157,29 +157,8 @@ if(Modernizr.webgl) {
 
 		map.on('load', function() {
 
+			console.log("I'm here loading")
 			map.addSource('area', { 'type': 'geojson', 'data': circles });
-
-			console.log("I'm here")
-
-			// map.addLayer({
-			// 				'id': 'maine',
-			// 				'type': 'fill',
-			// 				'source': {
-			// 						'type': 'geojson',
-			// 						'data': {
-			// 								'type': 'Feature',
-			// 								'geometry': {
-			// 										'type': 'Polygon',
-			// 										'coordinates': [hull.geometry.coordinates[0]]
-			// 								}
-			// 						}
-			// 				},
-			// 				'layout': {},
-			// 				'paint': {
-			// 						'fill-color': '#088',
-			// 						'fill-opacity': 0.8
-			// 				}
-			// 		});
 
 			zoomThreshold = 11;
 
@@ -208,7 +187,7 @@ if(Modernizr.webgl) {
 			}, 'place_suburb');
 
 
-			console.log("I'm here")
+
 
 			map.addLayer({
 				'id': 'areahover',
@@ -234,8 +213,6 @@ if(Modernizr.webgl) {
 
 
 
-			console.log("I'm here")
-
 					//Highlight stroke on mouseover (and show area information)
 
 					map.on("click", function(e) {
@@ -248,7 +225,21 @@ if(Modernizr.webgl) {
 					});
 
 
+					console.log("I'm here finished loading")
+
+
 		 });
+
+		 map.on('render', afterChangeComplete); // warning: this fires many times per second!
+
+		 function afterChangeComplete () {
+		   if (!map.loaded()) {console.log("rendering"); return } // still not loaded; bail out.
+
+		   // now that the map is loaded, it's safe to query the features:
+		  // map.queryRenderedFeatures(...);
+
+		   map.off('render', afterChangeComplete); // remove this handler now that we're done.
+		 }
 
 		$("#submitPost").click(function( event ) {
 						event.preventDefault();
@@ -605,15 +596,27 @@ if(Modernizr.webgl) {
 			//d3.select('#keydiv').append("p").attr("id","street").text("")
 
 			keydivwidth = parseInt(d3.select("#keydiv").style("width"));
+			bodywidth = parseInt(d3.select("body").style("width"));
+
+			if(bodywidth < 790 && bodywidth > 590) {
+				keydivwidth=(keydivwidth/2);
+			}
+
+			console.log(keydivwidth)
 
 			d3.select('#keydiv').append("div").attr("class","context").style("width",keydivwidth +"px").html("&#8212; <span style='font-weight:400'>"+ city +" average </span>" + Math.round(average_city*100) + "%" ).style("opacity",0);
 			d3.select('#keydiv').append("svg").attr("class","score").attr("width",keydivwidth/2).attr("height",keydivwidth/2);
 			d3.select('#keydiv').append("div").attr("class","illustration").style("width",keydivwidth/2 +"px").style("height",keydivwidth/2 +"px").style("float","right");
-;
-			d3.select('#keydiv').append("div").attr("class","context2").style("width",(keydivwidth-20) +"px").html("<span>Your road</span> is the <span>xx</span><span style='text-transform:none'>th</span> greenest street out of <span>xxx</span> in <span>" + city + "</span>");
-			//d3.select('#keydiv').append("div").attr("class","streetview").style("width",keydivwidth +"px");
 
+
+		if(bodywidth < 790 && bodywidth > 590) {
+			console.log(keydivwidth*2)
+			d3.select('#keydiv').append("div").attr("class","context2").style("width",(keydivwidth*(70/50))-20 +"px").html("<span>Your road</span> is the <span>xx</span><span style='text-transform:none'>th</span> greenest street out of <span>xxx</span> in <span>" + city + "</span>");
+			d3.select('#keydiv').append("div").attr("class","share").style("width",(keydivwidth*(30/50))-30 +"px").html("<span>Share</span>");
+		} else {
+			d3.select('#keydiv').append("div").attr("class","context2").style("width",(keydivwidth-20) +"px").html("<span>Your road</span> is the <span>xx</span><span style='text-transform:none'>th</span> greenest street out of <span>xxx</span> in <span>" + city + "</span>");
 			d3.select('#keydiv').append("div").attr("class","share").style("width",(keydivwidth-20) +"px").html("<span>Share</span>");
+		}
 
 			sharebuttons = 	d3.select('.share').append("div").style("padding-top","5px")
 
@@ -788,6 +791,8 @@ if(Modernizr.webgl) {
 
 
 	function loadnewdata(city, lat,lng) {
+
+		map.flyTo({center:[lng,lat], zoom:15, speed:0.7})
 
 		map.removeLayer('area')
 		map.removeLayer('areahover')

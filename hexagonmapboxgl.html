@@ -8,16 +8,18 @@
 
   <link href='css/mapbox-gl.css' rel='stylesheet'/>
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700,800,900" rel="stylesheet">
-  <link rel="stylesheet" href="css/chosen.css">
+  <link rel="stylesheet" href="css/bootstrap-grid.css">
 
 <style>
-    body {
+
+  body {
 		margin:0;
 		padding:0;
 		font-family: 'Open Sans', sans-serif;
 		max-width:960px;
     width:100%;
     margin:0px auto;
+    display: table !important;
 	}
 
 	#header{
@@ -29,8 +31,64 @@
     font-size:12px;
   }
 
+  .share {
 
-	@media (min-width: 600px) {
+    margin-top:8px;
+    margin-right:20px;
+    margin-bottom:8px;
+    padding: 10px;
+    font-weight: bold;
+    text-align:center;
+    font-size: 16px;
+    color:#246193;
+    background-color:#DEE7EF;
+
+  }
+
+  .context {
+
+    padding-top: 14px;
+    margin-bottom: -25px;
+    text-align:right;
+    font-weight: bold;
+    font-size: 16px;
+    color:#00722F;
+
+  }
+
+  .context2 {
+
+    margin-top:8px;
+    margin-right:20px;
+    margin-bottom:8px;
+    padding: 10px;
+    font-weight: 400;
+    font-size: 16px;
+    color:#1F7D42;
+    background-color:#D8E7D0;
+
+  }
+
+  .context2 span {
+
+    /*text-transform: uppercase;*/
+    font-weight: bold;
+
+
+  }
+
+  #postcodetext {
+    margin: 15px 0px;
+    font-weight: bold;
+    color: #0075A3;
+  }
+
+  ::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+      color: #ccc;
+      opacity: 1; /* Firefox */
+  }
+
+	@media (min-width:791px) {
 		#map {
       float:right;
 			height: 550px;
@@ -62,9 +120,69 @@
 
 	}
 
+  @media (min-width:590px) and (max-width:790px) {
+    #map {
+      float:right;
+      height: 400px;
+      width: 100%;
+    }
+
+    #selectNav {
+      width:50%;
+      background-color:rgba(255,255,255,0.8);
+      z-index:1;
+    }
+
+    #keydiv {
+      float:left;
+      width:100%;
+      background-color:rgba(255,255,255,0.8);
+      z-index:1;
+    }
+
+    #currVal {
+      fill: #666;
+      font-size:11px;
+      font-family: 'Open Sans', sans-serif;
+
+    }
+
+    .context {
+      padding-top: 0px;
+      float: right;
+      margin-top:-20px;
+
+    }
+
+    .context2 {
+      margin:10px 0px 10px 0px;
+      float: left;
+      height:62px;
+    }
+
+    .share {
+      margin:10px 0px 10px 0px;
+      float: right;
+      height:62px;
+
+    }
+
+    .score, .illustration {
+
+      margin-top:-20px;
+
+    }
 
 
-	@media (max-width: 599px) {
+    #postcodetext {
+
+      font-size: 24px;
+
+    }
+  }
+
+
+	@media (max-width: 589px) {
 
 		 body {
 			height: 620px;
@@ -189,6 +307,7 @@
 #errorMessage {
     color: red;
     font-size: 16px;
+    margin:0px;
 }
 
 .blocks {
@@ -214,11 +333,7 @@
 #button-pic {
     height: 30px;
 }
-#postcodetext {
-  margin: 15px 0px;
-  font-weight: bold;
-  color: #0075A3;
-}
+
 
 #street {
 
@@ -230,37 +345,7 @@
 
 }
 
-.context {
 
-  padding-top: 14px;
-  margin-bottom: -25px;
-  text-align:right;
-  font-weight: bold;
-  font-size: 16px;
-  color:#00722F;
-
-}
-
-.context2 {
-
-  margin-top:8px;
-  margin-right:20px;
-  margin-bottom:8px;
-  padding: 10px;
-  font-weight: 400;
-  font-size: 16px;
-  color:#1F7D42;
-  background-color:#D8E7D0;
-
-}
-
-.context2 span {
-
-  /*text-transform: uppercase;*/
-  font-weight: bold;
-
-
-}
 
 #street span {
 
@@ -270,19 +355,7 @@
 
 }
 
-.share {
 
-  margin-top:8px;
-  margin-right:20px;
-  margin-bottom:8px;
-  padding: 10px;
-  font-weight: bold;
-  text-align:center;
-  font-size: 16px;
-  color:#246193;
-  background-color:#DEE7EF;
-
-}
 
 .copytext {
   color: #246193;
@@ -360,7 +433,7 @@
   font-weight: 400;
 }
 
-@media (min-width: 600px) and (max-width: 700px) {
+/* @media (min-width: 600px) and (max-width: 700px) {
 
 
   #street {
@@ -402,7 +475,7 @@
     transform: translate(0px, -15px)
   }
 
-}
+} */
 
 .domain {
   stroke:none;
@@ -423,10 +496,10 @@
 <div id='keydiv'>
   <div id='selectNav'>
 
-    <form style="margin-top: 10px; height: 40px" id="pcForm">
+    <form style="margin-top: 10px; id="pcForm">
       <div style="display:inline;float:left;width:100%">
         <label labelfor="pcText" id="postcodetext" style="display:inline;float:left;width:100%">Enter your postcode or click on the map</label>
-        <input style='width:calc(100% - 40px)' id="pcText" class="picaarticle" type="text" tabindex="1" placeholder="e.g. CF10 1BJ">
+        <input style='width:calc(100% - 40px)' id="pcText" class="picaarticle" type="text" tabindex="1" placeholder="Eg. CF10 1BJ or NP10 8ZN">
         <button style='float:right' class="btnEnable" id="submitPost" type="submit"><img src="images/image.png" id="button-pic" alt=""></button>
       </div>
       <div>
@@ -453,7 +526,7 @@
 
 <p style='font-weight:bold; padding-top:10px'>Map control on mobile</p>
 <p>Use one finger to pan around on the map, and two to zoom, tilt and rotate.</p>
-<button id="OK" type="submit">I'm done</button>
+<button id="OK" type="submit">Close</button>
   </div>
   <div id="legenddiv"></div>
 </div>
