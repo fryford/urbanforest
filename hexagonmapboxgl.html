@@ -91,9 +91,17 @@
 	@media (min-width:791px) {
 		#map {
       float:right;
-			height: 550px;
+			height: 520px;
 			width: 65%;
 		}
+
+    #infofooter {
+      float:right;
+      height: 30px;
+      width: 65%;
+      background-color:#246193;
+      color:#fff;
+    }
 
 		#selectNav {
 			width:100%;
@@ -112,9 +120,10 @@
 		}
 
 		#currVal {
-      fill: #666;
-			font-size:11px;
+      fill: #323132;
+			font-size:14px;
       font-family: 'Open Sans', sans-serif;
+      text-anchor: middle;
 
 		}
 
@@ -125,6 +134,14 @@
       float:right;
       height: 400px;
       width: 100%;
+    }
+
+    #infofooter {
+      float:right;
+      height: 30px;
+      width: 100%;
+      background-color:#246193;
+      color:#fff;
     }
 
     #selectNav {
@@ -183,16 +200,21 @@
 
 
 	@media (max-width: 589px) {
-
-		 body {
-			height: 620px;
-		}
+    body {
+      width: 100%;
+    }
 
 	  #map {
-			height: 450px;
+			height: 420px;
 			width: 100%;
-			overflow:visible;
 		}
+
+    #infofooter {
+      height: 30px;
+      width: 100%;
+      background-color:#246193;
+      color:#fff;
+    }
 
 		#selectNav {
 			width:100%;
@@ -215,6 +237,17 @@
 		.mapboxgl-ctrl-fullscreen {
 			display:none !important;
 		}
+
+    .context2 {
+      margin:10px 0px 10px 0px;
+      height:62px;
+    }
+
+    .share {
+      margin:10px 0px 10px 0px;
+      height:62px;
+
+    }
 	}
 
 
@@ -374,8 +407,8 @@
     position: absolute;
     bottom: 0px;
     left: 0px;
-    width: 200px;
-    height: 80px;
+    width: 220px;
+    height: 65px;
     z-index: 2;
     background-color: rgba(255,255,255,0.7);
 }
@@ -387,13 +420,13 @@
   left: 10px;
   z-index: 2;
   background-color: #fff;
-  border: 1px solid #ccc;
+  border: 1px solid #246193;
   color: #246193;
   padding: 5px 10px;
   text-align: center;
   text-decoration: none;
   display: inline-block;
-  font-size: 12px;
+  font-size: 14px;
 
 }
 
@@ -486,7 +519,9 @@
 }
 
 .tick text{
-  fill:#666;
+  font-family:"Open Sans";
+  font-size:14px;
+  fill:#323132;
 }
 
 </style>
@@ -498,7 +533,7 @@
 
     <form style="margin-top: 10px; id="pcForm">
       <div style="display:inline;float:left;width:100%">
-        <label labelfor="pcText" id="postcodetext" style="display:inline;float:left;width:100%">Enter your postcode or click on the map</label>
+        <label labelfor="pcText" id="postcodetext" style="display:inline;float:left;width:100%">Enter your postcode or click on the map to explore</label>
         <input style='width:calc(100% - 40px)' id="pcText" class="picaarticle" type="text" tabindex="1" placeholder="Eg. CF10 1BJ or NP10 8ZN">
         <button style='float:right' class="btnEnable" id="submitPost" type="submit"><img src="images/image.png" id="button-pic" alt=""></button>
       </div>
@@ -511,12 +546,12 @@
 
 <div id='map'>
 
-  <button id="howtouse" type="submit">How to use this map</button>
+  <!-- <button id="howtouse" type="submit">How to use this map</button> -->
   <div id="howtouseinfo">
 
 
 <h2>How to use the map</h2>
-<p>This map shows you how much vegetation can be seen from a pedestrian's view of the street, in 10 metre sections, across the city. For instance, if the area is 70% green, it means that 70% of pedestrians' views in that spot are taken up by vegetation such as trees, hedges, grass, etc.</p>
+<p>This map shows you how much vegetation there is in each street. Each hexagon on the map shows how green a 10 metre section of road is, based on our analysis of Google Streetview images. <a href='https://datasciencecampus.ons.gov.uk/mapping-the-urban-forest-at-street-level/' target='_blank'>Read more about how we used machine learning to create this dataset.</a></p>
 
 <p style='font-weight:bold; padding-top:10px'>Map control on desktop</p>
 <p>Using the mouse wheel will zoom in and out.</p>
@@ -529,6 +564,26 @@
 <button id="OK" type="submit">Close</button>
   </div>
   <div id="legenddiv"></div>
+
+</div>
+<div id="infofooter">
+  <p id="infofootertext" style="
+    font-family: 'Open Sans';
+    font-weight: 600;
+    margin: 5px;
+    font-size: 14px;
+    cursor:pointer;
+    float:left;
+    text-decoration: underline;">How to use this map</p>
+
+    <p id="feedbackfootertext" style="
+      font-family: 'Open Sans';
+      font-weight: 600;
+      margin: 5px;
+      font-size: 14px;
+      cursor:pointer;
+      float:right;
+      text-decoration: underline;">Give us feedback</p>
 </div>
 
 <!--<script src="http://d3js.org/d3.v3.min.js"></script>

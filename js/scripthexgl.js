@@ -47,7 +47,7 @@ if(Modernizr.webgl) {
 		document.title = dvc.maptitle;
 
 		//show information
-		d3.select("#howtouse")
+		d3.select("#infofootertext")
 			.on("click", function(){d3.select("#howtouseinfo").style("display","block")});
 
 		d3.select("#OK")
@@ -56,7 +56,7 @@ if(Modernizr.webgl) {
 
 		//Set up number formats
 		displayformat = d3.format("." + dvc.displaydecimals + "f");
-		legendformat = d3.format("." + dvc.legenddecimals + "f");
+		legendformat = d3.format("s");
 
 		//set up basemap
 		map = new mapboxgl.Map({
@@ -130,12 +130,9 @@ if(Modernizr.webgl) {
 
 		});
 
-		//work out bounding box
-		var bbox = turf.bbox(points);
-		var bboxPolygon = turf.bboxPolygon(bbox);
 
-		console.log(bbox)
-		console.log(bboxPolygon);
+		var bboxPolygonCardiff = turf.bboxPolygon([-3.27843, 51.45315, -3.08093, 51.54714]);
+		var bboxPolygonNewport = turf.bboxPolygon([-3.083526, 51.550568, -2.879582, 51.621126]);
 
 		//work out convex hull for bounding area1
 		hull = turf.convex(points);
@@ -246,6 +243,47 @@ if(Modernizr.webgl) {
 		   map.off('render', afterChangeComplete); // remove this handler now that we're done.
 		 }
 
+		map.on('moveend', inCity)
+
+		function inCity() {
+			viewportmap = map.getBounds();
+
+			console.log(viewportmap)
+			pointstotest = [];
+
+			/*NE*/ pointstotest.push([viewportmap._ne.lng, viewportmap._ne.lat])
+			/*SW*/ pointstotest.push([viewportmap._sw.lng, viewportmap._sw.lat])
+			/*SE*/ pointstotest.push([viewportmap._sw.lng, viewportmap._ne.lat])
+			/*NW*/ pointstotest.push([viewportmap._ne.lng, viewportmap._sw.lat])
+			console.log(pointstotest)
+
+			var allpoints = turf.points(pointstotest)
+
+			var ptsWithinCardiff = turf.pointsWithinPolygon(allpoints, bboxPolygonCardiff);
+			var ptsWithinNewport = turf.pointsWithinPolygon(allpoints, bboxPolygonNewport);
+			console.log(ptsWithinCardiff.features.length)
+			console.log(ptsWithinNewport.features.length)
+
+			if(ptsWithinCardiff.features.length > 0) {
+				newcity = "Cardiff"
+			} else if(ptsWithinNewport.features.length > 0) {
+				newcity = "Newport"
+			}
+
+			if(newcity != city) {
+				city=newcity;
+				if(city == "Newport" || city == "Cardiff") {
+					loadbydrag = true;
+					loadnewdata(newcity);
+				}
+			}
+
+
+
+
+
+		}
+
 		$("#submitPost").click(function( event ) {
 						event.preventDefault();
 						event.stopPropagation();
@@ -286,11 +324,10 @@ if(Modernizr.webgl) {
 							  if(newcity != city) {
 									city = newcity;
 									if(city == "Newport" || city == "Cardiff") {
-										loadnewdata(newcity,lat,lng);
+										flytonewcity(newcity,lat,lng);
 									} else {
 										success(lat,lng);
 									}
-									//success(lat,lng);
 								} else {
 									success(lat,lng);
 								}
@@ -536,6 +573,8 @@ if(Modernizr.webgl) {
 
 				d3.select('.context2').html("<span>"+ road + "</span> is the <span>" + commaFormat(rank) + "</span><span style='text-transform:none'>" + stndrdth + "</span> greenest street out of <span>" + numberRoads + "</span> in <span>" + city + "</span>");
 
+				d3.select("#twitterShare").attr("href","https://twitter.com/intent/tweet?text=I just found out my road is " + displayformat(percentage) + "&#37 green! How green is yours? If you live in Newport and Cardiff, you can check here " + ParentURL)
+
 				//d3.select(".streetview").select("a").remove();
 
 				//d3.select('.streetview').append("a").attr("href","http://maps.google.com/maps?q=&layer=c&cbll=" + +coords[1] +"," + +coords[0] + "&cbp=11,0,0,0,0").text("Goto Google Streetview").attr("target","_blank");
@@ -616,10 +655,10 @@ if(Modernizr.webgl) {
 
 		if(bodywidth < 790 && bodywidth > 590) {
 			console.log(keydivwidth*2)
-			d3.select('#keydiv').append("div").attr("class","context2").style("width",(keydivwidth*(70/50))-20 +"px").html("<span>Your road</span> is the <span>__</span><span style='text-transform:none'></span> greenest street out of <span>___</span> in <span>________</span>");
+			d3.select('#keydiv').append("div").attr("class","context2").style("width",(keydivwidth*(70/50))-20 +"px").html("Enter your postcode or click on the map to find out how green your street is.");
 			d3.select('#keydiv').append("div").attr("class","share").style("width",(keydivwidth*(30/50))-30 +"px").html("<span>Share</span>");
 		} else {
-			d3.select('#keydiv').append("div").attr("class","context2").style("width",(keydivwidth-20) +"px").html("<span>Your road</span> is the <span>__</span><span style='text-transform:none'></span> greenest street out of <span>___</span> in <span>________</span>");
+			d3.select('#keydiv').append("div").attr("class","context2").style("width",(keydivwidth-20) +"px").html("Enter your postcode or click on the map to find out how green your street is.");
 			d3.select('#keydiv').append("div").attr("class","share").style("width",(keydivwidth-20) +"px").html("<span>Share</span>");
 		}
 
@@ -644,7 +683,7 @@ if(Modernizr.webgl) {
 
 			sharebuttons.append("a")
 					.attr("id","twitterShare")
-					.attr("href","https://twitter.com/intent/tweet?text=Explore Do you know how green your street is? Explore this interactive map: " + ParentURL)
+					.attr("href","https://twitter.com/intent/tweet?text=How green is your street? Explore vegetation at street level in Cardiff and Newport with this interactive map " + ParentURL)
 					.attr("target","_blank")
 					.style("height","30px")
 					.style("width","30px")
@@ -696,7 +735,7 @@ if(Modernizr.webgl) {
 				.append("svg")
 				.attr("id", "key")
 				.attr("width", keywidth)
-				.attr("height",75);
+				.attr("height",65);
 
 			breaks = [0,20,40,60,80,100];
 
@@ -707,13 +746,13 @@ if(Modernizr.webgl) {
 			// Set up scales for legend
 			x = d3.scaleLinear()
 				.domain([breaks[0], breaks[dvc.numberBreaks]]) /*range for data*/
-				.range([0,keywidth-30]); /*range for pixels*/
+				.range([0,keywidth-40]); /*range for pixels*/
 
 
 			var xAxis = d3.axisBottom(x)
 				.tickSize(5)
-				.tickValues(color.domain())
-			//	.tickFormat(legendformat);
+				.tickValues(x.domain())
+			  .tickFormat(function(d) { return d + "%"; })
 
 			var g2 = svgkey.append("g").attr("id","horiz")
 				.attr("transform", "translate(15,35)");
@@ -753,10 +792,10 @@ if(Modernizr.webgl) {
 
 			g2.append("text")
 				.attr("id", "currVal")
-				.attr("x", 19)
-				.attr("y", 32)
+				.attr("x", 90)
+				.attr("y", 18)
 				.attr("fill","#000")
-				.text("% green");
+				.html("more vegetation &rarr;");
 
 
 
@@ -772,7 +811,8 @@ if(Modernizr.webgl) {
 				.attr("width", function(d) { return d.x1 - d.x0; })
 				.style("fill", function(d) { return d.z; });
 
-			keyhor.call(xAxis).append("text")
+			keyhor.call(xAxis)
+				.append("text")
 				.attr("id", "caption")
 				.attr("x", -63)
 				.attr("y", -20)
@@ -795,9 +835,16 @@ if(Modernizr.webgl) {
 	} // Ends create key
 
 
-	function loadnewdata(city, lat,lng) {
+	function flytonewcity(city, lat,lng) {
+
+	  map.off('moveend', inCity)
 
 		map.flyTo({center:[lng,lat], zoom:15, speed:0.7})
+		loadnewdata(city);
+		loadbydrag = false;
+	}
+
+	function loadnewdata(city) {
 
 		map.removeLayer('area')
 		map.removeLayer('areahover')
@@ -834,12 +881,8 @@ if(Modernizr.webgl) {
 				points.features.push(point);
 
 		});
-		//work out bounding box
-		var bbox = turf.bbox(points);
-		var bboxPolygon = turf.bboxPolygon(bbox);
 
-		console.log(bbox)
-		console.log(bboxPolygon);
+
 
 		//work out convex hull for bounding area1
 		hull = turf.convex(points);
@@ -856,7 +899,7 @@ if(Modernizr.webgl) {
 
 		roadRank = Object.keys(average_road).sort(function(a,b){return average_road[b]-average_road[a]})
 
-		numberRoads = roadRank.length;
+		numberRoads = commaFormat(roadRank.length);
 
 
 		map.addSource('area', { 'type': 'geojson', 'data': circles });
@@ -907,9 +950,13 @@ if(Modernizr.webgl) {
 			}, "filter": ["==", "road", ""]
 		}, 'place_suburb');
 
+		if(loadbydrag == false) {
 			success(lat,lng);
+		}
 
-			d3.select(".context").html("&#8212; <span style='font-weight:400'>"+ city +" average </span>" + Math.round(average_city*100) + "%" );
+		d3.select(".context").html("&#8212; <span style='font-weight:400'>"+ city +" average </span>" + Math.round(average_city*100) + "%" );
+
+		map.on('moveend', inCity)
 
 
 	}
