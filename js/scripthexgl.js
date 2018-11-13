@@ -573,7 +573,7 @@ if(Modernizr.webgl) {
 
 				d3.select('.context2').html("<span>"+ road + "</span> is the <span>" + commaFormat(rank) + "</span><span style='text-transform:none'>" + stndrdth + "</span> greenest street out of <span>" + numberRoads + "</span> in <span>" + city + "</span>");
 
-				d3.select("#twitterShare").attr("href","https://twitter.com/intent/tweet?text=I just found out my road is " + displayformat(percentage) + "&#37 green! How green is yours? If you live in Newport and Cardiff, you can check here " + ParentURL)
+				d3.select("#twitterShare").attr("href","https://twitter.com/intent/tweet?text=I just found out my road is " + displayformat(percentage) + "%25 green! How green is yours? If you live in Newport and Cardiff, you can check here " + ParentURL)
 
 				//d3.select(".streetview").select("a").remove();
 
