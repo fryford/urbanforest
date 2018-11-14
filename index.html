@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0], j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})
+  (window,document,'script','dataLayer','GTM-MBCBVQS');
+  </script>
+  <meta charset="UTF-8">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <title>Map title here</title>
+  <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+
+  <link href='css/mapbox-gl.css' rel='stylesheet'/>
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700,800,900" rel="stylesheet">
+  <link rel="stylesheet" href="css/bootstrap-grid.css">
+
+<style>
+
+  body {
+		margin:0;
+		padding:0;
+		font-family: 'Open Sans', sans-serif;
+		max-width:960px;
+    width:100%;
+    margin:0px auto;
+    display: table !important;
+	}
+
+	#header{
+		height:70px;
+		width:100%
+	}
+
+  #people {
+    font-size:12px;
+  }
+
+  .share {
+
+    margin-top:8px;
+    margin-right:20px;
+    margin-bottom:8px;
+    padding: 10px;
+    font-weight: bold;
+    text-align:center;
+    font-size: 16px;
+    color:#246193;
+    background-color:#DEE7EF;
+
+  }
+
+  .context {
+
+    padding-top: 14px;
+    margin-bottom: -25px;
+    text-align:right;
+    font-weight: bold;
+    font-size: 16px;
+    color:#00722F;
+
+  }
+
+  .context2 {
+
+    margin-top:8px;
+    margin-right:20px;
+    margin-bottom:8px;
+    padding: 10px;
+    font-weight: 400;
+    font-size: 16px;
+    color:#1F7D42;
+    background-color:#D8E7D0;
+
+  }
+
+  .context2 span {
+
+    /*text-transform: uppercase;*/
+    font-weight: bold;
+
+
+  }
+
+  #postcodetext {
+    margin: 15px 0px;
+    font-weight: bold;
+    color: #0075A3;
+  }
+
+  ::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+      color: #ccc;
+      opacity: 1; /* Firefox */
+  }
+
+	@media (min-width:791px) {
+		#map {
+      float:right;
+			height: 520px;
+			width: 65%;
+		}
+
+    #infofooter {
+      float:right;
+      height: 35px;
+      width: 65%;
+      background-color:#246193;
+      color:#fff;
+    }
+
+		#selectNav {
+			width:100%;
+			height:105px;
+			background-color:rgba(255,255,255,0.8);
+			z-index:1;
+		}
+
+		#keydiv {
+      float:left;
+			width:calc(35% - 20px);
+			height:140px;
+
+			background-color:rgba(255,255,255,0.8);
+			z-index:1;
+		}
+
+		#currVal {
+      fill: #323132;
+			font-size:14px;
+      font-family: 'Open Sans', sans-serif;
+      text-anchor: middle;
+
+		}
+
+	}
+
+  @media (min-width:590px) and (max-width:790px) {
+    #map {
+      float:right;
+      height: 400px;
+      width: 100%;
+    }
+
+    #infofooter {
+      float:right;
+      height: 35px;
+      width: 100%;
+      background-color:#246193;
+      color:#fff;
+    }
+
+    #selectNav {
+      width:50%;
+      background-color:rgba(255,255,255,0.8);
+      z-index:1;
+    }
+
+    #keydiv {
+      float:left;
+      width:100%;
+      background-color:rgba(255,255,255,0.8);
+      z-index:1;
+    }
+
+    #currVal {
+      fill: #666;
+      font-size:11px;
+      font-family: 'Open Sans', sans-serif;
+
+    }
+
+    .context {
+      padding-top: 0px;
+      float: right;
+      margin-top:-20px;
+
+    }
+
+    .context2 {
+      margin:10px 0px 10px 0px;
+      float: left;
+      height:62px;
+    }
+
+    .share {
+      margin:10px 0px 10px 0px;
+      float: right;
+      height:62px;
+
+    }
+
+    .score, .illustration {
+
+      margin-top:-20px;
+
+    }
+
+
+    #postcodetext {
+
+      font-size: 24px;
+
+    }
+  }
+
+
+	@media (max-width: 589px) {
+    body {
+      width: 100%;
+    }
+
+	  #map {
+			height: 420px;
+			width: 100%;
+		}
+
+    #infofooter {
+      height: 35px;
+      width: 100%;
+      background-color:#246193;
+      color:#fff;
+    }
+
+		#selectNav {
+			width:100%;
+			height:105px;
+			background-color:rgba(255,255,255,0.8);
+			z-index:3;
+		}
+
+		#keydiv {
+			width:100%;
+			background-color:rgba(255,255,255,0.8);
+			z-index:1;
+		}
+
+		#currVal {
+			font-size:14px;
+
+		}
+
+		.mapboxgl-ctrl-fullscreen {
+			display:none !important;
+		}
+
+    .context2 {
+      margin:10px 0px 10px 0px;
+      height:62px;
+    }
+
+    .share {
+      margin:10px 0px 10px 0px;
+      height:62px;
+
+    }
+	}
+
+
+.key /* required */
+{
+	display: inline-block;
+	margin: 0 0 1em 0;
+	padding: 0;
+	line-height: 15px;
+}
+.key .legendlabel {
+	white-space: nowrap;
+	margin-right: 13px;
+	font-size: 12px;
+	color: #333;
+	font-weight: normal;
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+.key .percentlabel {
+	white-space: nowrap;
+	margin-right: 13px;
+	font-size: 12px;
+	float: right;
+	color: #333;
+	font-weight: normal;
+	font-family: Arial, Helvetica, sans-serif;
+	text-align:right;
+}
+
+.key li/* required */
+{
+	/* margin: 2px 23px 2px 10px; */
+    padding: 0;
+    line-height: 15px;
+}
+.key b /* required */
+{
+	display: inline-block;
+	width: 35px;
+	height: 15px;
+	margin-right: 6px;
+	float: right;
+	background-color:none;
+	margin-top:8px;
+	border-radius:15px;
+}
+.legendBlocks{ /* new for Cluster chart */
+	width: 15px !important;
+	margin-top:0px !important;
+}
+.key legendlabel/* required */
+{
+	white-space: nowrap;
+	font-size: 12px;
+	color: #333;
+	font-weight: normal;
+}
+
+.key .percentlabel/* required */
+{
+	white-space: nowrap;
+	font-size: 12px;
+	width: 40px;
+	color: #333;
+	float:right;
+	font-weight: normal;
+}
+
+.key .legendRect {
+
+	float: left;
+    /*width: 10px;*/
+    height: 13px;
+    background-color: #666;
+}
+
+
+
+#pcText {
+    width: 100%;
+    height: 40px;
+    color: #666;
+    font-size: 16px;
+    padding-left:10px;
+    box-sizing: border-box;
+    border: 2px solid #0075a3;
+}
+
+#errorMessage {
+    color: red;
+    font-size: 16px;
+    margin:0px;
+}
+
+.blocks {
+  stroke-width:1px;
+  stroke: #666;
+}
+
+.btnEnable {
+      -moz-box-sizing: border-box;
+      box-sizing: border-box;
+      width: 40px;
+      height: 40px;
+      border: none;
+      padding: 0px 0!important;
+      background-color: #0075A3;
+      font: 700 16px Arial;
+      color: #FFF;
+      filter: inherit;
+      -webkit-appearance: button;
+      cursor: pointer;
+}
+
+#button-pic {
+    height: 30px;
+}
+
+
+#street {
+
+  margin-top:8px;
+  margin-bottom:0px;
+  font-weight: bold;
+  font-size: 24px;
+  color:#0075A3;
+
+}
+
+
+
+#street span {
+
+  font-weight: 400;
+  font-size: 16px;
+  color:#0075A3;
+
+}
+
+
+
+.copytext {
+  color: #246193;
+  font-size: 16px;
+  padding-left: 10px;
+  box-sizing: border-box;
+  border: 1px solid #246193;
+}
+
+.socialicon:hover {
+  opacity:0.7;
+  cursor:pointer;
+}
+
+#legenddiv {
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    width: 220px;
+    height: 65px;
+    z-index: 2;
+    background-color: rgba(255,255,255,0.7);
+}
+
+#howtouse {
+
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  background-color: #fff;
+  border: 1px solid #246193;
+  color: #246193;
+  padding: 5px 10px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 14px;
+
+}
+
+#howtouseinfo {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    width: calc(100% - 75px);
+    z-index: 3;
+    background-color: #246193;
+    color: #fff;
+    padding: 15px 15px;
+    display: none;
+
+}
+
+
+#OK {
+  background-color: #fff;
+  border: none;
+  color: #246193;
+  padding: 10px 16px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+.percentgreen {
+  font-size: 40px;
+  font-weight: bold;
+}
+
+.textgreen {
+  font-size: 20px;
+  font-weight: 400;
+}
+
+/* @media (min-width: 600px) and (max-width: 700px) {
+
+
+  #street {
+    font-size: 16px;
+    font-weight: bold;
+  }
+
+  #street span {
+    font-size: 16px;
+    font-weight: 400;
+
+  }
+
+  .percentgreen {
+    font-size: 16px;
+    font-weight: bold;
+    transform: translate(0px, -7px)
+  }
+
+  .textgreen {
+    font-size: 14px;
+    font-weight: 400;
+    transform: translate(0px, -15px)
+  }
+
+}
+
+@media (min-width: 701px) and (max-width: 799px) {
+
+  .percentgreen {
+    font-size: 24px;
+    font-weight: bold;
+    transform: translate(0px, -7px)
+  }
+
+  .textgreen {
+    font-size: 16px;
+    font-weight: 400;
+    transform: translate(0px, -15px)
+  }
+
+} */
+
+.domain {
+  stroke:none;
+}
+
+.tick line{
+  stroke:#ccc;
+}
+
+.tick text{
+  font-family:"Open Sans";
+  font-size:14px;
+  fill:#323132;
+}
+
+a {
+  color: #fff;
+}
+
+#errorMessage a {
+  color: red !important;
+}
+
+.loader {
+  z-index:2;
+  position: absolute;
+  top: calc(50% - 20px);
+  left: calc(50% - 20px);
+  width:40px;
+  height:40px;
+  background-color:rgba(255,255,255,0.7);
+  z-index: 3;
+
+}
+
+
+</style>
+
+</head>
+<body>
+  <noscript>
+    <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MBCBVQS" height="0" width="0" style="display:none;visibility:hidden"></iframe>
+  </noscript>
+<div id='keydiv'>
+  <div id='selectNav'>
+
+    <form style="margin-top: 10px;" id="pcForm">
+      <div style="display:inline;float:left;width:100%">
+        <label labelfor="pcText" id="postcodetext" style="display:inline;float:left;width:100%">Enter your postcode or click on the map to explore</label>
+        <input style='width:calc(100% - 40px)' id="pcText" class="picaarticle" type="text" tabindex="1" placeholder="Eg. CF10 1BJ or NP10 8ZN">
+        <button style='float:right' class="btnEnable" id="submitPost" type="submit"><img src="images/image.png" id="button-pic" alt=""></button>
+      </div>
+      <div>
+      </div>
+    </form>
+  </div>
+
+</div>
+
+<div id='map'>
+      <div class="loader" title="0" id="loader">
+          <svg version="1.1" id="loader-1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="40px" height="40px" viewBox="0 0 40 40" enable-background="new 0 0 40 40" xml:space="preserve">
+              <path opacity="0.2" fill="#6EB54A" d="M20.201,5.169c-8.254,0-14.946,6.692-14.946,14.946c0,8.255,6.692,14.946,14.946,14.946
+      s14.946-6.691,14.946-14.946C35.146,11.861,28.455,5.169,20.201,5.169z M20.201,31.749c-6.425,0-11.634-5.208-11.634-11.634
+      c0-6.425,5.209-11.634,11.634-11.634c6.425,0,11.633,5.209,11.633,11.634C31.834,26.541,26.626,31.749,20.201,31.749z" />
+              <path fill="#6EB54A" d="M26.013,10.047l1.654-2.866c-2.198-1.272-4.743-2.012-7.466-2.012h0v3.312h0
+      C22.32,8.481,24.301,9.057,26.013,10.047z">
+                  <animateTransform attributeType="xml" attributeName="transform" type="rotate" from="0 20 20" to="360 20 20" dur="0.5s" repeatCount="indefinite" />
+              </path>
+          </svg>
+      </div>
+  <!-- <button id="howtouse" type="submit">How to use this map</button> -->
+  <div id="howtouseinfo">
+
+
+<h2>How to use the map</h2>
+<p>This map shows you how much vegetation there is in each street. Each hexagon on the map shows how green a 10 metre section of road is, based on our analysis of Google Streetview images. <a href='https://datasciencecampus.ons.gov.uk/mapping-the-urban-forest-at-street-level/' target='_blank'>Read more about how we used machine learning to create this dataset.</a></p>
+
+<p style='font-weight:bold; padding-top:10px'>Map control on desktop</p>
+<p>Using the mouse wheel will zoom in and out.</p>
+
+<p style="line-height:1.8em">Holding <span aria-label="Control" style="border:1px solid #fff;padding: 3px 7px;border-radius: 4px;margin: 0 2px;">CTRL</span> and left-click will allow you to tilt and rotate the map.</p>
+<p style="line-height:1.8em">Holding <span aria-label="Shift" style="border:1px solid #fff;padding: 3px 7px;border-radius: 4px;margin: 0 2px;">SHIFT</span> and left-clicking will allow you to draw a box on the map and zoom into the selected area.</p>
+
+<p style='font-weight:bold; padding-top:10px'>Map control on mobile</p>
+<p>Use one finger to pan around on the map, and two to zoom, tilt and rotate.</p>
+<button id="OK" type="submit">Close</button>
+  </div>
+  <div id="legenddiv"></div>
+
+</div>
+<div id="infofooter">
+  <p id="infofootertext" style="
+    font-family: 'Open Sans';
+    font-weight: 600;
+    margin-left: 16px;
+    margin-top: 7px;
+    font-size: 14px;
+    cursor:pointer;
+    float:left;
+    text-decoration: underline;">How to use this map</p>
+
+    <a id="feedbackfootertext" style="
+      font-family: 'Open Sans';
+      font-weight: 600;
+      margin-top: 7px;
+      margin-right: 14px;
+      font-size: 14px;
+      cursor:pointer;
+      float:right;
+      text-decoration: underline;" href='https://www.surveymonkey.co.uk/r/ONSurbanforest' target="_blank">Give us feedback</a>
+</div>
+
+<!--<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://d3js.org/topojson.v1.min.js"></script>-->
+
+<script src="https://cdn.ons.gov.uk/vendor/d3/4.2.7/d3.min.js"></script>
+<script src="js/topojson.v2.min.js"></script>
+<script src="js/simple-statistics.min.js"></script>
+<script src="js/modernizr.min.js"></script>
+<script src="js/d3-queue.min.js"></script>
+<script src="js/colorbrewer.js"></script>
+<script src="https://cdn.ons.gov.uk/vendor/jquery/2.1.4/jquery.min.js"></script>
+<script src="js/chosen.jquery.js"></script>
+<script src="js/limit.js"></script>
+<script src="https://cdn.ons.gov.uk/vendor/pym/0.4.2/pym.min.js"></script>
+
+
+
+<!--<script src='js/mapbox-gl.js'></script>-->
+<script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.44.2/mapbox-gl.js'></script>
+
+
+<script src='https://npmcdn.com/@turf/turf/turf.min.js'></script>
+<script src="js/scripthexgl.js"></script>
+
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0], j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})
+(window,document,'script','dataLayer','GTM-MBCBVQS');
+</script>
+
+<noscript>
+<iframe src="https://www.googletagmanager.com/ns.html?id=GTM-MBCBVQS" height="0" width="0" style="display:none;visibility:hidden"></iframe>
+</noscript>
+
+<noscript>
+	<p>Your browser does not support JavaScript. If you're able to please enable Javascript to view the map.</p>
+</noscript>
+
+</body>
+</html>
